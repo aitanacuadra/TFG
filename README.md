@@ -1,6 +1,6 @@
 # Generación Automática de Metadatos DCAT/DCAT-AP
 **Trabajo de Fin de Grado – Ingeniería de Tecnologías y Servicios de Telecomunicación (UPM)**
-
+**Autora: Aitana Cuadra** 
 Este proyecto implementa una **API REST en FastAPI** capaz de analizar archivos JSON o CSV, extraer su estructura e inferir metadatos automáticos siguiendo los estándares **DCAT / DCAT-AP**, utilizando un **modelo de lenguaje local (Ollama)**.
 
 ---
