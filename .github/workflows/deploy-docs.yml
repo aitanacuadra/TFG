@@ -1,0 +1,39 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main  # Asegúrate de que tu rama principal se llama 'main' (o cámbialo a 'master')
+    # Solo se activa si tocas algo de la web o este mismo archivo
+    paths:
+      - 'website/**'
+      - '.github/workflows/deploy-docs.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Instalar dependencias y construir
+        working-directory: ./website  
+        run: |
+          npm install
+          npm run build
+
+      - name: Desplegar a GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/build # Docusaurus guarda aquí la web compilada
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
