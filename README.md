@@ -12,8 +12,7 @@ Este proyecto implementa una **API REST en FastAPI** capaz de analizar archivos 
 | Lenguaje | Python 3.13 |
 | API Framework | FastAPI |
 | Procesamiento | Pandas |
-| LLM | Ollama (Gemma / Llama) con LangChain |
-| Modelado | SQLModel, Pydantic |
+| LLM | Ollama (Gemma) con LangChain |
 
 
 ---
