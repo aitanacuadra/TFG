@@ -4,9 +4,7 @@ from typing import Dict, Any, Optional, List, Tuple
 import pandas as pd
 from app.core.config import settings
 
-# =============================================================================
-# 1. FUNCIONES UTILITARIAS (Herramientas genéricas)
-# =============================================================================
+
 
 def slugify(text: str) -> str:
     """Convierte texto a formato URL-safe (ej: 'Hola Mundo' -> 'hola-mundo')."""
@@ -17,14 +15,14 @@ def slugify(text: str) -> str:
 
 def infer_xsd_type(col_name: str, series: pd.Series, llm_type: Optional[str] = None) -> str:
     """Infiere el tipo de dato XSD (string, integer, date) para una columna."""
-    # Si la IA ya nos dio un tipo XSD, lo usamos
+    
     if isinstance(llm_type, str) and llm_type.startswith("xsd:"):
         return llm_type
 
     dtype_str = str(series.dtype).lower()
     name = col_name.lower()
 
-    # Heurísticas por nombre
+    
     if "date" in name or name.startswith("fecha"):
         return "xsd:dateTime" if "datetime" in dtype_str else "xsd:date"
     if name.endswith("_id") or name == "id":
@@ -49,9 +47,7 @@ def build_keywords(df: pd.DataFrame, title: str) -> List[str]:
     # Eliminar duplicados preservando orden
     return list(dict.fromkeys(base))
 
-# =============================================================================
-# 2. FUNCIONES AUXILIARES PRIVADAS (Detalles de implementación)
-# =============================================================================
+
 
 def _normalize_llm_variables(variables_raw: Any) -> Dict[str, Dict[str, Any]]:
     """Limpia y estandariza la salida de variables que viene de la IA."""
@@ -60,7 +56,7 @@ def _normalize_llm_variables(variables_raw: Any) -> Dict[str, Dict[str, Any]]:
     if isinstance(variables_raw, list):
         for v in variables_raw:
             if not isinstance(v, dict): continue
-            # Buscar nombre en varias claves posibles
+          
             name = v.get("name") or v.get("column") or v.get("col")
             if not name: continue
             
@@ -104,9 +100,9 @@ def _build_measured_variables(df: pd.DataFrame, var_info: Dict) -> List[Dict]:
         })
     return variables
 
-# =============================================================================
-# 3. FUNCIÓN CEREBRO (Orquestador Principal)
-# =============================================================================
+
+# FUNCIÓN CEREBRO
+
 
 def build_dcat3_metadata(
     raw_meta: Dict[str, Any],
@@ -116,10 +112,6 @@ def build_dcat3_metadata(
     file_size_bytes: int,
     dataset_id: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """
-    Función Principal (Cerebro): Orquesta la creación del JSON-LD.
-    No contiene lógica compleja, solo llama a los especialistas.
-    """
     
     # 1. Extracción de datos básicos
     title = raw_meta.get("title") or filename
