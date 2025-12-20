@@ -3,6 +3,10 @@
 
 Este proyecto implementa una **API REST en FastAPI** capaz de analizar archivos JSON o CSV, extraer su estructura e inferir metadatos automáticos siguiendo los estándares **DCAT / DCAT-AP**, utilizando un **modelo de lenguaje local (Ollama)**.
 
+
+> **Documentación Completa:** Puedes consultar la guía de instalación y detalles mas completos de mi proyecto en la [Web de Documentación del Proyecto](https://aitanacuadra.github.io/TFG/).
+
+
 ---
 
 ## Tecnologías utilizadas
