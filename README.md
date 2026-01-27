@@ -73,7 +73,7 @@ OLLAMA_MODEL=gemma2:2b
 
 ### 6. Ejecutar la API
 ```bash
-uvicorn main:app --reload
+PYTHONPATH=src uvicorn app.main:app --reload
 ```
 La API estará disponible en: http://localhost:8000
 
