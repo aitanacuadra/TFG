@@ -9,6 +9,23 @@ import styles from './index.module.css';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
+
+  // 1. Estilo común para ambos botones (Blanco y Azul UPM)
+  const buttonStyle = {
+    backgroundColor: 'white',
+    color: '#165688',           // Texto Azul
+    border: 'none',             // Sin bordes extraños
+    padding: '12px 24px',       // Tamaño del botón
+    margin: '0 10px',           // Separación entre ellos
+    fontWeight: 'bold',         // Texto en negrita
+    fontSize: '1.1rem',         // Tamaño de letra
+    borderRadius: '8px',        // Bordes un poco redondeados
+    textDecoration: 'none',     // Quitar subrayado
+    display: 'inline-flex',
+    alignItems: 'center',
+    cursor: 'pointer'
+  };
+
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
@@ -16,34 +33,24 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          {/* Botón 1: Documentación (Este se queda igual) */}
+        
+        {/* Contenedor de botones centrado */}
+        <div className={styles.buttons} style={{display: 'flex', justifyContent: 'center', marginTop: '2rem'}}>
+          
+          {/* Botón 1: Documentación */}
           <Link
-            className="button button--secondary button--lg"
-            to="/docs">
-            Ver Documentación
+            to="/docs"
+            style={buttonStyle}>
+            Documentación
           </Link>
 
-          {/* Botón 2: NUEVO BOTÓN UPM */}
+          {/* Botón 2: GitHub (Idéntico al anterior) */}
           <Link
-            className="button button--lg"
-            // 👇 Estilos inline para que el botón sea blanco y el logo se ajuste bien
-            style={{
-              marginLeft: '15px',
-              backgroundColor: 'white',
-              color: '#165688', // Color azul UPM para el texto
-              border: '1px solid rgba(255,255,255,0.8)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              paddingTop: '0.8rem',
-              paddingBottom: '0.8rem'
-            }}
-            to="https://github.com/aitanacuadra/TFG"> 
+            to="https://github.com/aitanacuadra/TFG"
+            style={buttonStyle}>
             Enlace a GitHub
-           
-            
-            
           </Link>
+
         </div>
       </div>
     </header>
