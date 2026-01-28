@@ -3,6 +3,10 @@
 
 Este proyecto implementa una **API REST en FastAPI** capaz de analizar archivos JSON o CSV, extraer su estructura e inferir metadatos automáticos siguiendo los estándares **DCAT / DCAT-AP**, utilizando un **modelo de lenguaje local (Ollama)**.
 
+
+> **Documentación Completa:** Puedes consultar la guía de instalación y detalles mas completos de mi proyecto en la [Web de Documentación del Proyecto](https://aitanacuadra.github.io/TFG/).
+
+
 ---
 
 ## Tecnologías utilizadas
@@ -69,7 +73,7 @@ OLLAMA_MODEL=gemma2:2b
 
 ### 6. Ejecutar la API
 ```bash
-uvicorn main:app --reload
+PYTHONPATH=src uvicorn app.main:app --reload
 ```
 La API estará disponible en: http://localhost:8000
 
