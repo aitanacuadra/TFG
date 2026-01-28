@@ -38,19 +38,11 @@ function HomepageHeader() {
               paddingTop: '0.8rem',
               paddingBottom: '0.8rem'
             }}
-            to="https://www.upm.es"> {/* Enlace a la web de la UPM */}
+            to="https://github.com/aitanacuadra/TFG"> 
             
-            {/* 👇 Aquí cargamos la imagen del logo */}
-            <img 
-               src={require('@site/static/img/upm-logo.png').default} 
-               alt="UPM Logo"
-               style={{
-                 height: '30px', // Tamaño del logo
-                 width: 'auto',
-                 marginRight: '10px' // Espacio entre logo y texto
-               }} 
-            />
-            UPM
+           
+            
+            
           </Link>
         </div>
       </div>
