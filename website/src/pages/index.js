@@ -21,7 +21,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs">
-            📚 Ver Documentación
+            Ver Documentación
           </Link>
 
           {/* Botón 2: NUEVO BOTÓN UPM */}
@@ -39,7 +39,7 @@ function HomepageHeader() {
               paddingBottom: '0.8rem'
             }}
             to="https://github.com/aitanacuadra/TFG"> 
-            
+            Enlace a GitHub
            
             
             
