@@ -6,7 +6,7 @@ import styles from './styles.module.css';
 // El '.default' al final es IMPORTANTE en Docusaurus para que funcione el SVG
 const FeatureList = [
   {
-    title: 'Inteligencia Artificial',
+    title: 'LLMs',
     
     Svg: require('@site/static/img/ai-agent.svg').default,
     description: (
