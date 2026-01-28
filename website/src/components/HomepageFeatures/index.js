@@ -2,34 +2,37 @@ import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
 
+// Importamos las imágenes SVG
+// El '.default' al final es IMPORTANTE en Docusaurus para que funcione el SVG
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Inteligencia Artificial',
+    
+    Svg: require('@site/static/img/ai-agent.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Uso de modelos LLM avanzados para analizar automáticamente el contenido 
+        semántico de tus archivos CSV y JSON.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Estándar DCAT-AP',
+    Svg: require('@site/static/img/chat-with-ai.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Generación de metadatos validados y totalmente compatibles con la 
+        normativa europea de Datos Abiertos.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'API FastAPI',
+    Svg: require('@site/static/img/dev-environment.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Backend de alto rendimiento construido con Python y FastAPI, 
+        documentado automáticamente y fácil de desplegar.
       </>
     ),
   },
@@ -39,6 +42,7 @@ function Feature({Svg, title, description}) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
+        {/* Aquí renderizamos el SVG con una clase CSS para controlar el tamaño */}
         <Svg className={styles.featureSvg} role="img" />
       </div>
       <div className="text--center padding-horiz--md">

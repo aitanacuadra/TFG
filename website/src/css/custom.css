@@ -1,30 +1,49 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+/* --- ESTILOS MODERNOS TIPO "LANDING PAGE" --- */
 
-/* You can override the default Infima variables here. */
-:root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+/* 1. Header con degradado elegante (Azul UPM moderno) */
+.hero--primary {
+  background: linear-gradient(135deg, #165688 0%, #0a2e4d 100%);
+  padding: 6rem 0; /* Más espacio vertical */
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+/* 2. Títulos más limpios */
+.hero__title {
+  font-weight: 800;
+  font-size: 3.5rem;
+  margin-bottom: 24px;
+}
+
+.hero__subtitle {
+  font-weight: 400;
+  font-size: 1.5rem;
+  margin-bottom: 32px;
+  opacity: 0.9;
+}
+
+/* 3. Tarjetas de características (Feature Cards) */
+/* Esto da el efecto de "caja flotante" que te gustaba */
+.col.col--4 {
+  padding: 2rem;
+  margin-top: 2rem;
+  border-radius: 16px; /* Bordes redondeados */
+  transition: all 0.3s ease; /* Animación suave */
+  border: 1px solid transparent;
+}
+
+/* Efecto al pasar el ratón por encima */
+.col.col--4:hover {
+  background-color: var(--ifm-card-background-color);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15); /* Sombra suave */
+  transform: translateY(-5px); /* Flota hacia arriba */
+  border-color: var(--ifm-color-emphasis-200);
+}
+
+/* 4. Botones modernos */
+.button--lg {
+  border-radius: 50px; /* Botones redondos tipo "pill" */
+  padding: 1rem 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
 }
