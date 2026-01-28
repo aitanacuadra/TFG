@@ -17,16 +17,40 @@ function HomepageHeader() {
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
+          {/* Botón 1: Documentación (Este se queda igual) */}
           <Link
             className="button button--secondary button--lg"
             to="/docs">
-            Ver Documentación
+            📚 Ver Documentación
           </Link>
+
+          {/* Botón 2: NUEVO BOTÓN UPM */}
           <Link
-            className="button button--outline button--secondary button--lg"
-            style={{marginLeft: '10px'}}
-            to="https://github.com/aitanacuadra/TFG">
-            GitHub
+            className="button button--lg"
+            // 👇 Estilos inline para que el botón sea blanco y el logo se ajuste bien
+            style={{
+              marginLeft: '15px',
+              backgroundColor: 'white',
+              color: '#165688', // Color azul UPM para el texto
+              border: '1px solid rgba(255,255,255,0.8)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              paddingTop: '0.8rem',
+              paddingBottom: '0.8rem'
+            }}
+            to="https://www.upm.es"> {/* Enlace a la web de la UPM */}
+            
+            {/* 👇 Aquí cargamos la imagen del logo */}
+            <img 
+               src={require('@site/static/img/upm-logo.png').default} 
+               alt="UPM Logo"
+               style={{
+                 height: '30px', // Tamaño del logo
+                 width: 'auto',
+                 marginRight: '10px' // Espacio entre logo y texto
+               }} 
+            />
+            UPM
           </Link>
         </div>
       </div>

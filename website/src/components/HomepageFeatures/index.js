@@ -11,8 +11,7 @@ const FeatureList = [
     Svg: require('@site/static/img/ai-agent.svg').default,
     description: (
       <>
-        Uso de modelos LLM avanzados para analizar automáticamente el contenido 
-        semántico de tus archivos CSV y JSON.
+        Procesamiento automatico de archivos mediante IA para extraer metadatos
       </>
     ),
   },
@@ -22,7 +21,7 @@ const FeatureList = [
     description: (
       <>
         Generación de metadatos validados y totalmente compatibles con la 
-        normativa europea de Datos Abiertos.
+        normativa DCAT-AP 
       </>
     ),
   },
@@ -31,8 +30,8 @@ const FeatureList = [
     Svg: require('@site/static/img/dev-environment.svg').default,
     description: (
       <>
-        Backend de alto rendimiento construido con Python y FastAPI, 
-        documentado automáticamente y fácil de desplegar.
+        Backend construido con Python y FastAPI
+        
       </>
     ),
   },
