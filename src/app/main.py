@@ -38,7 +38,7 @@ async def custom_swagger_ui_html():
         swagger_favicon_url="https://www.upm.es/favicon.ico",
     )
 
-# ... (Aquí debajo irían tus rutas y middlewares como siempre) ...
+
 
 @app.on_event("startup")
 def on_startup():

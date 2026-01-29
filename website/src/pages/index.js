@@ -10,17 +10,17 @@ import styles from './index.module.css';
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
 
-  // 1. Estilo común para ambos botones (Blanco y Azul UPM)
+  
   const buttonStyle = {
     backgroundColor: 'white',
-    color: '#165688',           // Texto Azul
-    border: 'none',             // Sin bordes extraños
-    padding: '12px 24px',       // Tamaño del botón
-    margin: '0 10px',           // Separación entre ellos
-    fontWeight: 'bold',         // Texto en negrita
-    fontSize: '1.1rem',         // Tamaño de letra
-    borderRadius: '8px',        // Bordes un poco redondeados
-    textDecoration: 'none',     // Quitar subrayado
+    color: '#165688',           
+    border: 'none',             
+    padding: '12px 24px',       
+    margin: '0 10px',          
+    fontWeight: 'bold',         
+    fontSize: '1.1rem',       
+    borderRadius: '8px',        
+    textDecoration: 'none',     
     display: 'inline-flex',
     alignItems: 'center',
     cursor: 'pointer'
@@ -34,17 +34,17 @@ function HomepageHeader() {
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         
-        {/* Contenedor de botones centrado */}
+     
         <div className={styles.buttons} style={{display: 'flex', justifyContent: 'center', marginTop: '2rem'}}>
           
-          {/* Botón 1: Documentación */}
+         
           <Link
             to="/docs"
             style={buttonStyle}>
             Documentación
           </Link>
 
-          {/* Botón 2: GitHub (Idéntico al anterior) */}
+          
           <Link
             to="https://github.com/aitanacuadra/TFG"
             style={buttonStyle}>

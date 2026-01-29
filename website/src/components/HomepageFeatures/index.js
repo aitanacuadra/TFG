@@ -2,8 +2,7 @@ import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
 
-// Importamos las imágenes SVG
-// El '.default' al final es IMPORTANTE en Docusaurus para que funcione el SVG
+
 const FeatureList = [
   {
     title: 'LLMs',
@@ -41,7 +40,7 @@ function Feature({Svg, title, description}) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        {/* Aquí renderizamos el SVG con una clase CSS para controlar el tamaño */}
+       
         <Svg className={styles.featureSvg} role="img" />
       </div>
       <div className="text--center padding-horiz--md">

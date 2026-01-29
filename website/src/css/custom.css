@@ -1,12 +1,12 @@
-/* --- ESTILOS MODERNOS TIPO "LANDING PAGE" --- */
 
-/* 1. Header con degradado elegante (Azul UPM moderno) */
+
+
 .hero--primary {
   background: linear-gradient(135deg, #165688 0%, #0a2e4d 100%);
-  padding: 6rem 0; /* Más espacio vertical */
+  padding: 6rem 0; 
 }
 
-/* 2. Títulos más limpios */
+
 .hero__title {
   font-weight: 800;
   font-size: 3.5rem;
@@ -20,27 +20,26 @@
   opacity: 0.9;
 }
 
-/* 3. Tarjetas de características (Feature Cards) */
-/* Esto da el efecto de "caja flotante" que te gustaba */
+
 .col.col--4 {
   padding: 2rem;
   margin-top: 2rem;
-  border-radius: 16px; /* Bordes redondeados */
-  transition: all 0.3s ease; /* Animación suave */
+  border-radius: 16px; 
+  transition: all 0.3s ease; 
   border: 1px solid transparent;
 }
 
-/* Efecto al pasar el ratón por encima */
+
 .col.col--4:hover {
   background-color: var(--ifm-card-background-color);
-  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15); /* Sombra suave */
-  transform: translateY(-5px); /* Flota hacia arriba */
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15); 
+  transform: translateY(-5px); 
   border-color: var(--ifm-color-emphasis-200);
 }
 
-/* 4. Botones modernos */
+
 .button--lg {
-  border-radius: 50px; /* Botones redondos tipo "pill" */
+  border-radius: 50px;
   padding: 1rem 2rem;
   font-weight: bold;
   text-transform: uppercase;

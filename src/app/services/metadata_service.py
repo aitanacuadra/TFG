@@ -30,7 +30,7 @@ def infer_xsd_type(col_name: str, series: pd.Series, llm_type: Optional[str] = N
     if name.startswith("is_") or name.startswith("has_"):
         return "xsd:boolean"
 
-    # Heurísticas por tipo de dato interno
+   
     if dtype_str.startswith("int"): return "xsd:integer"
     if dtype_str.startswith("float"): return "xsd:decimal"
     if "bool" in dtype_str: return "xsd:boolean"
@@ -44,7 +44,7 @@ def build_keywords(df: pd.DataFrame, title: str) -> List[str]:
     base.extend([w.lower() for w in re.findall(r"\w+", title) if len(w) > 3][:5])
     base.extend([str(c) for c in df.columns[:10]])
     
-    # Eliminar duplicados preservando orden
+    
     return list(dict.fromkeys(base))
 
 

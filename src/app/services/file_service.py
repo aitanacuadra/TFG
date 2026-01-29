@@ -30,13 +30,11 @@ def sniff_dataframe(file_bytes: bytes, content_type: str) -> Tuple[pd.DataFrame,
                 print("✅ Archivo detectado como JSON por su contenido.")
                 return df, "json"
             except json.JSONDecodeError:
-                pass # Parecía JSON pero no lo era, seguimos
+                pass 
     except Exception:
-        pass # Falló algo en la lectura, seguimos a CSV
+        pass 
 
-    # ---------------------------------------------------------
-    # 2. INTENTO DE CSV (Estrategia Fuerza Bruta)
-    # ---------------------------------------------------------
+ 
     try:
         encodings_to_try = ["utf-8", "latin-1", "cp1252", "iso-8859-1"]
         separators_to_try = [",", ";", "\t", "|"]
@@ -59,7 +57,7 @@ def sniff_dataframe(file_bytes: bytes, content_type: str) -> Tuple[pd.DataFrame,
                     last_exception = e
                     continue
 
-        # Último intento permisivo (motor python)
+       
         try:
              df = pd.read_csv(io.BytesIO(file_bytes), encoding="latin-1", sep=None, engine="python")
              return df, "csv"
@@ -69,7 +67,7 @@ def sniff_dataframe(file_bytes: bytes, content_type: str) -> Tuple[pd.DataFrame,
         raise last_exception or ValueError("No se pudo leer ni como JSON ni como CSV.")
 
     except Exception as e:
-        # Hacemos el error más legible para el usuario
+       
         raise HTTPException(
             status_code=400, 
             detail=f"Error al procesar archivo. Si es un JSON asegúrate de que es válido. Error técnico: {str(e)}"
@@ -85,8 +83,7 @@ def dataframe_profile(df: pd.DataFrame) -> Dict:
         "examples": {}
     }
     for c in df.columns:
-        # ARREGLO: Usamos dropna() para obtener un ejemplo válido de forma segura
-        # Esto evita el error "truth value of an array is ambiguous" si la celda contiene una lista
+        
         try:
             valid_series = df[c].dropna()
             if not valid_series.empty:

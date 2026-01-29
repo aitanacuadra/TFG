@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
-# --- Bloques pequeños (Sub-esquemas) ---
+
 
 class DCATDistribution(BaseModel):
     type_: str = Field(alias="@type", default="dcat:Distribution")
