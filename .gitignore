@@ -17,3 +17,5 @@ runs.db
 
 # Cosas de Jupyter
 .ipynb_checkpoints
+
+.DS_Store
