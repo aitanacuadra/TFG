@@ -19,3 +19,5 @@ runs.db
 .ipynb_checkpoints
 
 .DS_Store
+
+faiss_index/

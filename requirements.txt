@@ -3,7 +3,9 @@ uvicorn[standard]
 python-multipart
 pandas
 pyarrow
+sqlmodel
 langchain
 langchain-community
-sqlmodel
 langchain-ollama
+faiss-cpu
+beautifulsoup4
