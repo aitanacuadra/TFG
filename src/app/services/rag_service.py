@@ -6,7 +6,7 @@ from langchain_ollama import OllamaEmbeddings
 
 from app.core.config import settings
 
-# --- 1. CONFIGURACIÓN GLOBAL ---
+
 FAISS_PATH = settings.FAISS_INDEX_PATH
 DOC_PATH = settings.RAG_DOC_PATH
 

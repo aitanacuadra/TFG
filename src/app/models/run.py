@@ -18,3 +18,4 @@ class RunMetadata(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     run_id: int
     metadata_json: str
+    evaluation_json: Optional[str] = None

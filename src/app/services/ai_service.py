@@ -4,6 +4,9 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_ollama import ChatOllama
 from langchain_community.vectorstores import FAISS
 from langchain_ollama import OllamaEmbeddings
+from google import genai
+import json
+import logging
 
 
 from app.core.config import settings
@@ -20,7 +23,7 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 llm = ChatOllama(model=settings.OLLAMA_MODEL, temperature=0)
 
 
-# --- 2. PROMPT ENRIQUECIDO ---
+
 SYSTEM_PROMPT = (
     "Eres un ingeniero de datos experto en la normativa europea DCAT-AP. "
     "Tu tarea es generar UN ÚNICO objeto JSON con metadatos a partir del perfil de un DataFrame y una muestra CSV. "
@@ -30,10 +33,11 @@ SYSTEM_PROMPT = (
     "-------------------------------------------\n\n"
     "El JSON debe incluir: title, description, variables (name, semantic_type, description, example) y notes. "
     "Responde SIEMPRE en español y devuelve exclusivamente JSON válido."
-)
+) 
 
 
-# --- 3. FUNCIONES PRINCIPALES ---
+
+
 def generate_metadata_with_langchain(profile: dict, sample_csv: str) -> dict:
     print("1. Consultando la normativa en FAISS (RAM)...")
     

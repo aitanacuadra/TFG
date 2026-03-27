@@ -1,7 +1,8 @@
+# src/app/schemas.py
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
-
+# --- Estructura para los metadatos DCAT-AP (Gemma) ---
 
 class DCATDistribution(BaseModel):
     type_: str = Field(alias="@type", default="dcat:Distribution")
@@ -25,14 +26,10 @@ class SchemaPropertyValue(BaseModel):
     class Config:
         populate_by_name = True
 
-# --- El objeto principal de Metadatos ---
-
 class DCATDataset(BaseModel):
     context: Dict[str, str] = Field(alias="@context")
     type_: str = Field(alias="@type", default="dcat:Dataset")
     id_: str = Field(alias="@id")
-    
-    # Campos Dublin Core (dct)
     title: str = Field(alias="dct:title")
     description: str = Field(alias="dct:description")
     identifier: str = Field(alias="dct:identifier")
@@ -40,16 +37,27 @@ class DCATDataset(BaseModel):
     dct_type: str = Field(alias="dct:type")
     format_: str = Field(alias="dct:format")
     provenance: str = Field(alias="dct:provenance")
-    
-    # Campos DCAT
     keyword: List[str] = Field(alias="dcat:keyword")
     distribution: List[DCATDistribution] = Field(alias="dcat:distribution")
-    
-    # Campos Schema.org
     variable_measured: List[SchemaPropertyValue] = Field(alias="schema:variableMeasured")
 
     class Config:
         populate_by_name = True
+
+# --- NUEVA ESTRUCTURA: Auditoría de Calidad MQA/FAIR (Gemini) ---
+
+class FairAnalysis(BaseModel):
+    findability: str
+    interoperability: str
+    reusability: str
+    exactitud_validez: str = Field(description="Evaluación de exactitud según DAMA")
+
+class MQAEvaluation(BaseModel):
+    score_global: int
+    categoria_mqa: str
+    analisis_fair: FairAnalysis
+    errores_gobernanza: List[str]
+    mejoras_prioritarias: List[str]
 
 # --- La respuesta final de la API ---
 
@@ -57,3 +65,5 @@ class ProcessFileResponse(BaseModel):
     message: str
     output_filename: str
     metadata: DCATDataset
+    evaluation: MQAEvaluation
+    

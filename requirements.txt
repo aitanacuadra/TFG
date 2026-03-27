@@ -9,3 +9,7 @@ langchain-community
 langchain-ollama
 faiss-cpu
 beautifulsoup4
+langchain-google-genai
+python-dotenv
+pydantic-settings
+google-generativeai
