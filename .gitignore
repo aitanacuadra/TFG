@@ -21,3 +21,4 @@ runs.db
 .DS_Store
 
 faiss_index/
+website/
