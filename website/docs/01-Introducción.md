@@ -4,10 +4,10 @@ slug: /
 title: Introducción
 ---
 
-# Generación Automática de Metadatos DCAT/DCAT-AP
+# Automatización de la generación de metadatos DCAT-AP mediante Modelos de Lenguaje de Gran Escala
 **Trabajo de Fin de Grado – Ingeniería de Tecnologías y Servicios de Telecomunicación (UPM)**
 
-Este proyecto implementa una **API REST en FastAPI** capaz de analizar archivos JSON o CSV, extraer su estructura e inferir metadatos automáticos siguiendo los estándares **DCAT / DCAT-AP**, utilizando un **modelo de lenguaje local (Ollama)**.
+El presente proyecto desarrolla una solución orientada a la mejora de la gestión y calidad de los metadatos. El objetivo principal consiste en automatizar la generación de metadatos conforme al estándar europeo DCAT-AP, transformando datos brutos en recursos estructurados, localizables y reutilizables. Para ello, se ha desarrollado una arquitectura basada en un sistema RAG que integra FastAPI, LangChain y Ollama. El sistema realiza un análisis de archivos en formato CSV y JSON para identificar su contenido y generar automáticamente metadatos alineados con el esquema DCAT-AP.
 
 ---
 
@@ -17,8 +17,11 @@ Este proyecto implementa una **API REST en FastAPI** capaz de analizar archivos 
 |------|-------------|
 | Lenguaje | Python 3.13 |
 | API Framework | FastAPI |
-| Procesamiento | Pandas |
-| LLM | Ollama (Gemma) con LangChain |
+| Procesamiento de datos | Pandas |
+| Orquestación de IA | LangChain |
+| Base de datos vectorial para RAG | FAISS |
+| LLM extracción metadatos | Ollama(gemma3:1b) |
+| LLM as a judge | gemini-3-flash-preview |
 
 
 ---

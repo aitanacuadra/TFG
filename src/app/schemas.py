@@ -44,19 +44,17 @@ class DCATDataset(BaseModel):
     class Config:
         populate_by_name = True
 
-# --- NUEVA ESTRUCTURA: Auditoría de Calidad MQA/FAIR (Gemini) ---
-
-class FairAnalysis(BaseModel):
+class MQAAnalysisDetail(BaseModel):
     findability: str
+    accessibility: str
     interoperability: str
     reusability: str
-    exactitud_validez: str = Field(description="Evaluación de exactitud según DAMA")
+    contextuality: str
 
 class MQAEvaluation(BaseModel):
     score_global: int
     categoria_mqa: str
-    analisis_fair: FairAnalysis
-    errores_gobernanza: List[str]
+    analisis_detallado: MQAAnalysisDetail  # Cambiado para coincidir con el prompt
     mejoras_prioritarias: List[str]
 
 # --- La respuesta final de la API ---

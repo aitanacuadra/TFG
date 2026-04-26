@@ -7,7 +7,7 @@ Instalar **Ollama**:  https://ollama.com/download
 Descargar el modelo utilizado:
 
 ```bash
-ollama pull gemma2:2b
+ollama pull gemma3:1b
 ```
 
 
@@ -44,6 +44,4 @@ uvicorn main:app --reload
 ```
 La API estará disponible en: http://localhost:8000
 
-Documentación interactiva:
-http://localhost:8000/docs
 

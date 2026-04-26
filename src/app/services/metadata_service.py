@@ -7,14 +7,13 @@ from app.core.config import settings
 
 
 def slugify(text: str) -> str:
-    """Convierte texto a formato URL-safe (ej: 'Hola Mundo' -> 'hola-mundo')."""
+    
     text = (text or "").strip().lower()
     text = re.sub(r"[^\w\-]+", "-", text)
     text = re.sub(r"-+", "-", text)
     return text.strip("-") or "dataset"
 
 def infer_xsd_type(col_name: str, series: pd.Series, llm_type: Optional[str] = None) -> str:
-    """Infiere el tipo de dato XSD (string, integer, date) para una columna."""
     
     if isinstance(llm_type, str) and llm_type.startswith("xsd:"):
         return llm_type
@@ -39,7 +38,7 @@ def infer_xsd_type(col_name: str, series: pd.Series, llm_type: Optional[str] = N
     return "xsd:string"
 
 def build_keywords(df: pd.DataFrame, title: str) -> List[str]:
-    """Genera keywords a partir del título y las columnas."""
+    
     base = ["dataset"]
     base.extend([w.lower() for w in re.findall(r"\w+", title) if len(w) > 3][:5])
     base.extend([str(c) for c in df.columns[:10]])
@@ -50,7 +49,7 @@ def build_keywords(df: pd.DataFrame, title: str) -> List[str]:
 
 
 def _normalize_llm_variables(variables_raw: Any) -> Dict[str, Dict[str, Any]]:
-    """Limpia y estandariza la salida de variables que viene de la IA."""
+    
     var_info = {}
     
     if isinstance(variables_raw, list):
@@ -99,9 +98,6 @@ def _build_measured_variables(df: pd.DataFrame, var_info: Dict) -> List[Dict]:
             "schema:description": desc,
         })
     return variables
-
-
-# FUNCIÓN CEREBRO
 
 
 def build_dcat3_metadata(

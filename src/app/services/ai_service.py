@@ -4,21 +4,16 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_ollama import ChatOllama
 from langchain_community.vectorstores import FAISS
 from langchain_ollama import OllamaEmbeddings
-from google import genai
-import json
-import logging
-
-
 from app.core.config import settings
 
 FAISS_PATH = settings.FAISS_INDEX_PATH
 
-print("Cargando base de datos vectorial y modelos en RAM (solo al arrancar)...")
+print("Cargando base de datos vectorial y modelos en RAM...")
 
 embeddings_model = OllamaEmbeddings(model=settings.EMBEDDINGS_MODEL)
 
 vectorstore = FAISS.load_local(FAISS_PATH, embeddings_model, allow_dangerous_deserialization=True)
-retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+retriever = vectorstore.as_retriever(search_kwargs={"k": 8})
 
 llm = ChatOllama(model=settings.OLLAMA_MODEL, temperature=0)
 
@@ -64,7 +59,4 @@ def generate_metadata_with_langchain(profile: dict, sample_csv: str) -> dict:
     })
 
 
-def get_simple_chat(prompt: str, model: str = settings.OLLAMA_MODEL) -> str:
-    """Envía un prompt simple a Ollama y devuelve la respuesta en texto."""
-    resp = ollama.chat(model=model, messages=[{"role": "user", "content": prompt}])
-    return resp["message"]["content"]
+

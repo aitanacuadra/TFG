@@ -2,7 +2,6 @@ import json
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Header
 from sqlmodel import Session
 from pydantic import BaseModel  
-
 from app.db.session import get_db
 from app.models.run import Run, RunMetadata
 from app.services import file_service, ai_service, metadata_service ,judge_service
@@ -10,27 +9,15 @@ from app.core.config import settings
 from app.api.deps import verify_api_key
 from app.schemas import ProcessFileResponse
 
-from app.core.config import settings
-
 router = APIRouter()
 
 class PromptIn(BaseModel):
     prompt: str
 
 
-@router.post("/generate")
-def generate_text(
-    body: PromptIn, 
-    api_key: str = Depends(verify_api_key)
-):
-    
-    response_text = ai_service.get_simple_chat(body.prompt)
-    return {"response": response_text}
-
 
 @router.post(
     "/process",
-
     response_model=ProcessFileResponse,  
     summary="Procesa un archivo y genera metadatos DCAT",
     description="Sube un CSV o JSON para obtener sus metadatos en formato JSON-LD compatible con DCAT-AP."
@@ -53,7 +40,7 @@ async def process_file(
 
     try:
          
-        df, kind = file_service.sniff_dataframe(content, file.content_type or "")
+        df, file_format = file_service.sniff_dataframe(content, file.content_type or "")
         profile = file_service.dataframe_profile(df)
         sample = file_service.head_as_csv(df)
         

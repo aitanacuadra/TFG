@@ -4,73 +4,59 @@ import pandas as pd
 from typing import Tuple, Dict
 from fastapi import HTTPException
 
-# En src/app/services/file_service.py
 
 def sniff_dataframe(file_bytes: bytes, content_type: str) -> Tuple[pd.DataFrame, str]:
-
-    try:
-      
-        try:
-            text = file_bytes.decode("utf-8").strip()
-        except UnicodeDecodeError:
-            text = file_bytes.decode("latin-1").strip()
-
     
-        if text and (text.startswith("{") or text.startswith("[")):
-            try:
-                obj = json.loads(text)
-                # Normalizamos según sea lista o dict
-                if isinstance(obj, list):
-                    df = pd.DataFrame(obj)
-                elif isinstance(obj, dict):
-                    df = pd.json_normalize(obj)
-                else:
-                    raise ValueError("JSON válido pero estructura no tabular")
-                
-                print("✅ Archivo detectado como JSON por su contenido.")
-                return df, "json"
-            except json.JSONDecodeError:
-                pass 
-    except Exception:
-        pass 
-
- 
     try:
-        encodings_to_try = ["utf-8", "latin-1", "cp1252", "iso-8859-1"]
-        separators_to_try = [",", ";", "\t", "|"]
         
-        last_exception = None
-
-        for encoding in encodings_to_try:
-            for sep in separators_to_try:
-                try:
-                    df = pd.read_csv(
-                        io.BytesIO(file_bytes), 
-                        encoding=encoding, 
-                        sep=sep,
-                        on_bad_lines='skip'
-                    )
-                    if df.shape[1] > 1:
-                        print(f"✅ CSV detectado: {encoding} | sep: '{sep}'")
-                        return df, "csv"
-                except Exception as e:
-                    last_exception = e
-                    continue
-
-       
-        try:
-             df = pd.read_csv(io.BytesIO(file_bytes), encoding="latin-1", sep=None, engine="python")
-             return df, "csv"
-        except:
-            pass
-
-        raise last_exception or ValueError("No se pudo leer ni como JSON ni como CSV.")
-
+        inicio = file_bytes[:50].decode('utf-8', errors='ignore').strip()
+        
+        if (inicio.startswith("{") or inicio.startswith("[")):
+            texto_completo = file_bytes.decode('utf-8')
+            obj = json.loads(texto_completo)
+            df = pd.DataFrame(obj) if isinstance(obj, list) else pd.json_normalize(obj)
+            return df, "json"
+            
     except Exception as e:
-       
         raise HTTPException(
             status_code=400, 
-            detail=f"Error al procesar archivo. Si es un JSON asegúrate de que es válido. Error técnico: {str(e)}"
+            detail=f"No se pudo procesar el archivo. Asegúrate de que sea un JSON o CSV válido. Error técnico: {str(e)}"
+        )
+        
+
+
+   
+    encodings = ["utf-8", "latin-1"]
+    separators = [",", ";", "\t", "|"]
+    sample_bytes = file_bytes[:10240] 
+    mejor_encoding = None
+    mejor_sep = None
+    for enc in encodings:
+        for sep in separators:
+            try:
+                df_test = pd.read_csv(io.BytesIO(sample_bytes), encoding=enc, sep=sep, nrows=5)
+                if df_test.shape[1] > 1:  
+                    mejor_encoding = enc
+                    mejor_sep = sep
+                    break
+            except Exception:
+                continue
+        if mejor_encoding:
+            break 
+
+    try:
+        if mejor_encoding and mejor_sep:
+            
+            df = pd.read_csv(io.BytesIO(file_bytes), encoding=mejor_encoding, sep=mejor_sep, on_bad_lines='skip')
+        else:
+            df = pd.read_csv(io.BytesIO(file_bytes), encoding="latin-1", sep=None, engine="python")
+            
+        return df, "csv"
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"No se pudo procesar el archivo. Asegúrate de que sea un JSON o CSV válido. Error técnico: {str(e)}"
         )
 
 def dataframe_profile(df: pd.DataFrame) -> Dict:

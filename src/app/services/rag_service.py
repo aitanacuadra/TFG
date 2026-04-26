@@ -11,20 +11,19 @@ FAISS_PATH = settings.FAISS_INDEX_PATH
 DOC_PATH = settings.RAG_DOC_PATH
 
 def init_vector_db():
-    print("1. Cargando la normativa DCAT-AP en HTML...")
+  
     loader = BSHTMLLoader(DOC_PATH, bs_kwargs={'features': 'html.parser'})
     document = loader.load()
     
-    print("2. Dividiendo el documento en chunks...")
+    print(" Dividiendo el documento en chunks...")
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
         chunk_overlap=50,
         length_function=len
     )
     chunks = text_splitter.split_documents(document)
-    print(f"Se han generado {len(chunks)} fragmentos.")
     
-    print("3. Creando embeddings con Ollama y guardando en FAISS...")
+    print("Creando embeddings con Ollama y guardando en FAISS...")
    
     embeddings_model = OllamaEmbeddings(model=settings.EMBEDDINGS_MODEL)
     
