@@ -26,12 +26,13 @@ El presente proyecto desarrolla una solución orientada a la mejora de la gesti�
 
 ```mermaid
 graph TD
-    Client["Usuario"] --> API["FastAPI"]
-    API --> Pre["Procesamiento con Pandas"]
-    Pre --> LLM["LLM local en Ollama"]
-    LLM --> Meta["Metadatos DCAT-AP"]
-    Meta --> API
-    API --> Client
+    User["Usuario"] --> API["FastAPI"]
+    API --> Profiling["Análisis del archivo"]
+    Profiling --> RAG["Extracción Semántica"]
+    RAG --> DCAT["Generación DCAT-AP"]
+    DCAT --> Judge["Evaluacion MQA"]
+    Judge --> API
+    API --> Output["Respuesta"]
 ```
 --- 
 ## Instalación
