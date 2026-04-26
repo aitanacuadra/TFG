@@ -7,6 +7,38 @@ El presente proyecto desarrolla una solución orientada a la mejora de la gesti�
 > **Documentación Completa:** Puedes consultar la guía de instalación y detalles mas completos de mi proyecto en la [Web de Documentación del Proyecto](https://aitanacuadra.github.io/TFG/).
 
 
+
+
+
+```mermaid
+graph LR
+    %% Definición de estilos
+    classDef input fill:#E3F2FD,stroke:#1565C0,stroke-width:2px;
+    classDef api fill:#4A148C,color:#fff,stroke:#311B92,stroke-width:2px;
+    classDef ai fill:#FF8F00,color:#fff,stroke:#EF6C00,stroke-width:2px;
+    classDef audit fill:#2E7D32,color:#fff,stroke:#1B5E20,stroke-width:2px;
+    classDef process fill:#F5F5F5,stroke:#616161,stroke-dasharray: 5 5;
+
+    %% Flujo
+    User([Usuario]) --> API[FastAPI]
+    
+    subgraph Pipeline ["Pipeline de Procesamiento de Datos"]
+        API --> Profiling[Análisis del archivo]
+        Profiling --> RAG[Extracción Semántica]
+        RAG --> DCAT[Generación DCAT-AP]
+        DCAT --> Judge[Evaluación de Calidad MQA]
+    end
+    
+    Judge --> API
+    API --> Output[(Respuesta Final)]
+
+    %% Aplicación de estilos
+    class User,Output input;
+    class API api;
+    class RAG ai;
+    class Judge audit;
+    class Profiling,DCAT process;
+```
 ---
 
 ## Tecnologías utilizadas
@@ -22,18 +54,6 @@ El presente proyecto desarrolla una solución orientada a la mejora de la gesti�
 | LLM as a judge | gemini-3-flash-preview |
 
 
----
-
-```mermaid
-graph TD
-    User["Usuario"] --> API["FastAPI"]
-    API --> Profiling["Análisis del archivo"]
-    Profiling --> RAG["Extracción Semántica"]
-    RAG --> DCAT["Generación DCAT-AP"]
-    DCAT --> Judge["Evaluacion MQA"]
-    Judge --> API
-    API --> Output["Respuesta"]
-```
 --- 
 ## Instalación
 
