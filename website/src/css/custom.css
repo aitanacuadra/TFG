@@ -1,0 +1,48 @@
+
+
+
+.hero--primary {
+  background: linear-gradient(135deg, #165688 0%, #0a2e4d 100%);
+  padding: 6rem 0; 
+}
+
+
+.hero__title {
+  font-weight: 800;
+  font-size: 3.5rem;
+  margin-bottom: 24px;
+}
+
+.hero__subtitle {
+  font-weight: 400;
+  font-size: 1.5rem;
+  margin-bottom: 32px;
+  opacity: 0.9;
+}
+
+
+.col.col--4 {
+  padding: 2rem;
+  margin-top: 2rem;
+  border-radius: 16px; 
+  transition: all 0.3s ease; 
+  border: 1px solid transparent;
+}
+
+
+.col.col--4:hover {
+  background-color: var(--ifm-card-background-color);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15); 
+  transform: translateY(-5px); 
+  border-color: var(--ifm-color-emphasis-200);
+}
+
+
+.button--lg {
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
