@@ -18,20 +18,26 @@ const config = {
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
   },
-  markdown: {
-    mermaid: true,
-  },
+  
   themes: ['@docusaurus/theme-mermaid'],
   // 3. Configuración para GitHub Pages (¡MUY IMPORTANTE!)
   url: 'https://aitanacuadra.github.io', // Tu usuario + github.io
   baseUrl: '/TFG/', // El nombre de tu repositorio con barras
-  
+
+  markdown: {
+    mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: 'warn', // Cambia a 'throw' cuando vayas a entregar el TFG
+    },
+  },
   // GitHub pages deployment config.
   organizationName: 'aitanacuadra', // Tu usuario de GitHub
   projectName: 'TFG', // El nombre de tu repositorio
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+
+  
+  
 
   // 4. Cambiamos el idioma a español
   i18n: {

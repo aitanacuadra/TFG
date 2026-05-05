@@ -29,6 +29,11 @@ async def process_file(
     api_key: str = Depends(verify_api_key)
 ):
     content = await file.read()
+    MAX_FILE_SIZE = 10 * 1024 * 1024  
+
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=413, detail="El archivo es demasiado grande. Límite: 10MB.")
+
     if not content:
         raise HTTPException(status_code=400, detail="Archivo vacío")
 
@@ -81,5 +86,6 @@ async def process_file(
         }
     
     except Exception as e:
-  
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error interno: {e}") # O usar logger.error
+        raise HTTPException(status_code=500, detail="Error interno del servidor al procesar el archivo.")
+    

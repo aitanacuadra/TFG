@@ -1,0 +1,30 @@
+
+
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:           
+         - .env
+    volumes:
+      - ./src:/app/src 
+      - ./faiss_index:/app/faiss_index # Esto permite que los cambios en tu código se reflejen sin reconstruir
+    environment:
+      - ENV=development
+      - PYTHONPATH=/app/src
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+
+  docs:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./website:/app/website
+      - /app/website/node_modules # Evita sobreescribir los módulos instalados en el contenedor
+    depends_on:
+      - api
