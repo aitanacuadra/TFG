@@ -1,21 +1,30 @@
-import os
+import logging
 from langchain_community.document_loaders import BSHTMLLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
 from langchain_ollama import OllamaEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
 
 from app.core.config import settings
 
+# 1. Configuración profesional del Logger (¡Adiós prints!)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-FAISS_PATH = settings.FAISS_INDEX_PATH
 DOC_PATH = settings.RAG_DOC_PATH
 
 def init_vector_db():
-  
-    loader = BSHTMLLoader(DOC_PATH, bs_kwargs={'features': 'html.parser'})
-    document = loader.load()
+    logger.info(f"Cargando documento normativo desde {DOC_PATH}...")
+    try:
+        # Usamos el loader para extraer el texto limpio del HTML
+        loader = BSHTMLLoader(DOC_PATH, bs_kwargs={'features': 'html.parser'})
+        document = loader.load()
+    except Exception as e:
+        logger.error(f"Error crítico al leer el documento: {e}")
+        return
     
-    print(" Dividiendo el documento en chunks...")
+    logger.info("Dividiendo el documento en fragmentos (chunks)...")
+    # Estrategia de fragmentación para mantener el contexto semántico sin ahogar al LLM
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
         chunk_overlap=50,
@@ -23,13 +32,29 @@ def init_vector_db():
     )
     chunks = text_splitter.split_documents(document)
     
-    print("Creando embeddings con Ollama y guardando en FAISS...")
-   
-    embeddings_model = OllamaEmbeddings(model=settings.EMBEDDINGS_MODEL)
+    logger.info(f"Conectando a Qdrant en {settings.QDRANT_URL}...")
     
-    db = FAISS.from_documents(chunks, embeddings_model)
-    db.save_local(FAISS_PATH)
-    print(f"¡Base de datos vectorial creada con éxito en la carpeta '{FAISS_PATH}'!")
+    # 2. Inicialización estricta del modelo de embeddings usando variables de entorno seguras
+    embeddings_model = OllamaEmbeddings(
+        model=settings.EMBEDDINGS_MODEL,
+        base_url=settings.OLLAMA_BASE_URL
+    )
+
+    logger.info(f"Vectorizando e ingestando {len(chunks)} fragmentos en la colección '{settings.QDRANT_COLLECTION}'...")
+    
+    try:
+        # 3. Creación e ingesta directa en el motor vectorial Qdrant
+        # force_recreate=True permite ejecutar este script para actualizar la normativa limpiando lo anterior
+        QdrantVectorStore.from_documents(
+            chunks,
+            embeddings_model,
+            url=settings.QDRANT_URL,
+            collection_name=settings.QDRANT_COLLECTION,
+            force_recreate=True 
+        )
+        logger.info("¡Base de datos vectorial Qdrant inicializada y poblada con éxito!")
+    except Exception as e:
+        logger.error(f"Fallo al conectar o insertar en Qdrant: {e}")
 
 if __name__ == "__main__":
     init_vector_db()

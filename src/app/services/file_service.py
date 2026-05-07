@@ -5,32 +5,42 @@ from typing import Tuple, Dict
 from fastapi import HTTPException
 
 
+MAX_SAMPLE_ROWS = 100 
+
 def sniff_dataframe(file_bytes: bytes, content_type: str) -> Tuple[pd.DataFrame, str]:
     
+    # 1. INTENTO DE PARSEO JSON
     try:
-        
         inicio = file_bytes[:50].decode('utf-8', errors='ignore').strip()
         
-        if (inicio.startswith("{") or inicio.startswith("[")):
+        if inicio.startswith("{") or inicio.startswith("["):
             texto_completo = file_bytes.decode('utf-8')
             obj = json.loads(texto_completo)
-            df = pd.DataFrame(obj) if isinstance(obj, list) else pd.json_normalize(obj)
+            
+            # EL TRUCO ESTÁ AQUÍ: Poda (Pruning) antes de dárselo a Pandas
+            if isinstance(obj, list):
+                # Si es una lista gigante, nos quedamos solo con la muestra inicial
+                obj_sample = obj[:MAX_SAMPLE_ROWS]
+                df = pd.DataFrame(obj_sample)
+            else:
+                # Si es un objeto anidado profundo, aplanamos pero cortamos enseguida
+                df = pd.json_normalize(obj).head(MAX_SAMPLE_ROWS)
+                
             return df, "json"
             
     except Exception as e:
         raise HTTPException(
             status_code=400, 
-            detail=f"No se pudo procesar el archivo. Asegúrate de que sea un JSON o CSV válido. Error técnico: {str(e)}"
+            detail=f"Error en JSON. Detalle técnico: {str(e)}"
         )
         
-
-
-   
+    # 2. INTENTO DE PARSEO CSV
     encodings = ["utf-8", "latin-1"]
     separators = [",", ";", "\t", "|"]
     sample_bytes = file_bytes[:10240] 
     mejor_encoding = None
     mejor_sep = None
+    
     for enc in encodings:
         for sep in separators:
             try:
@@ -45,20 +55,20 @@ def sniff_dataframe(file_bytes: bytes, content_type: str) -> Tuple[pd.DataFrame,
             break 
 
     try:
+        # EL SEGUNDO TRUCO: Leer solo las filas estrictamente necesarias del CSV
         if mejor_encoding and mejor_sep:
-            
-            df = pd.read_csv(io.BytesIO(file_bytes), encoding=mejor_encoding, sep=mejor_sep, on_bad_lines='skip')
+            df = pd.read_csv(io.BytesIO(file_bytes), encoding=mejor_encoding, sep=mejor_sep, on_bad_lines='skip', nrows=MAX_SAMPLE_ROWS)
         else:
-            df = pd.read_csv(io.BytesIO(file_bytes), encoding="latin-1", sep=None, engine="python")
+            df = pd.read_csv(io.BytesIO(file_bytes), encoding="latin-1", sep=None, engine="python", nrows=MAX_SAMPLE_ROWS)
             
         return df, "csv"
 
     except Exception as e:
         raise HTTPException(
             status_code=400, 
-            detail=f"No se pudo procesar el archivo. Asegúrate de que sea un JSON o CSV válido. Error técnico: {str(e)}"
+            detail=f"No se pudo procesar el CSV. Error técnico: {str(e)}"
         )
-
+    
 def dataframe_profile(df: pd.DataFrame) -> Dict:
     profile = {
         "num_rows": int(df.shape[0]),

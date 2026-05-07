@@ -32,6 +32,7 @@ class DCATDataset(BaseModel):
     id_: str = Field(alias="@id")
     title: str = Field(alias="dct:title")
     description: str = Field(alias="dct:description")
+    theme: str = Field(alias="dcat:theme")
     identifier: str = Field(alias="dct:identifier")
     language: str = Field(alias="dct:language")
     dct_type: str = Field(alias="dct:type")

@@ -1,15 +1,27 @@
-fastapi
-uvicorn[standard]
-python-multipart
-pandas
-pyarrow
-sqlmodel
-langchain
-langchain-community
-langchain-ollama
-faiss-cpu
-beautifulsoup4
-langchain-google-genai
-python-dotenv
-pydantic-settings
-google-generativeai
+# --- Core API & Web ---
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9
+pydantic-settings>=2.1.0
+
+# --- Procesamiento de Datos ---
+pandas>=2.1.0
+pyarrow>=15.0.0
+
+# --- Base de Datos Relacional ---
+sqlmodel>=0.0.16
+
+# --- Inteligencia Artificial & LangChain ---
+langchain>=0.1.10
+langchain-community>=0.0.25
+langchain-ollama>=0.0.1
+langchain-google-genai>=0.0.9
+google-generativeai>=0.4.0
+
+# --- Base de Datos Vectorial (Qdrant) ---
+qdrant-client>=1.8.0
+langchain-qdrant>=0.1.1
+
+# --- Utilidades RAG ---
+beautifulsoup4>=4.12.3
+python-dotenv>=1.0.1
