@@ -22,3 +22,4 @@ runs.db
 
 faiss_index/
 data/
+qdrant_data/
