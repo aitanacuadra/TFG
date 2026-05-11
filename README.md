@@ -93,7 +93,7 @@ docker compose up --build
 
 Esto arranca tres servicios:
 - **API** → http://localhost:8000
-- **Documentación** (Docusaurus) → http://localhost:3000
+- **Documentación** (Docusaurus) → http://localhost:3000/TFG
 - **Qdrant** → http://localhost:6333
 
 ---

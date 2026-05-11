@@ -1,47 +1,58 @@
+---
+sidebar_position: 2
+title: Instalación
+---
 
+# Instalación
 
-### 1. Prerrequisitos
+## Prerrequisitos
 
-Instalar **Ollama**:  https://ollama.com/download
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y en ejecución.
+- [Ollama](https://ollama.com/download) instalado en el host (corre fuera de Docker para aprovechar la GPU).
 
-Descargar el modelo utilizado:
+Descarga los modelos necesarios:
 
 ```bash
 ollama pull gemma3:1b
+ollama pull nomic-embed-text
 ```
 
+> Son los modelos predeterminados. Puedes usar cualquier otro modelo disponible en [ollama.com/library](https://ollama.com/library) cambiando `OLLAMA_MODEL` y `EMBEDDINGS_MODEL` en tu `.env`.
 
-### 2. Clonar el repositorio
+---
+
+## 1. Clonar el repositorio
+
 ```bash
 git clone https://github.com/aitanacuadra/TFG
 cd TFG
 ```
 
-### 3. Crear entorno virtual 
+## 2. Configurar variables de entorno
+
 ```bash
-python -m venv venv
-source venv/bin/activate   # Linux / macOS
-# venv\Scripts\activate    # Windows
+cp .env.example .env
 ```
 
-### 4. Instalar dependencias
+Edita `.env` y sustituye los valores marcados con `<...>`. Solo necesitas rellenar dos campos:
+
+| Variable | Descripción |
+|----------|-------------|
+| `API_KEY` | Clave para autenticar las peticiones a la API (pon la que quieras) |
+| `GEMINI_API_KEY` | Clave de Google Gemini · [Obtener aquí](https://aistudio.google.com/app/apikey) |
+
+El resto de variables ya están preconfiguradas para Docker en el `.env.example`.
+
+## 3. Levantar los servicios
+
 ```bash
-pip install -r requirements.txt
+docker compose up --build
 ```
 
-### 5. Configurar variables de entorno
+Esto arranca tres servicios:
 
-Crear un archivo .env:
-```bash
-BASE_DATASET_URL=https://example.org/datasets/
-OLLAMA_HOST=http://localhost:11434
-OLLAMA_MODEL=gemma2:2b
-```
-
-### 6. Ejecutar la API
-```bash
-uvicorn main:app --reload
-```
-La API estará disponible en: http://localhost:8000
-
-
+| Servicio | URL |
+|----------|-----|
+| API (Swagger UI) | http://localhost:8000/docs |
+| Documentación (Docusaurus) | http://localhost:3000/TFG/ |
+| Qdrant (panel de control) | http://localhost:6333/dashboard |
