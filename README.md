@@ -1,44 +1,42 @@
-# Automatización de la generación de metadatos DCAT-AP mediante Modelos de Lenguaje de Gran Escala
+# Diseño e implementación de un sistema de generación automatizada de metadatos DCAT-AP basado en Modelos de Lenguaje de Gran Escala (LLMs).
 **Trabajo de Fin de Grado – Ingeniería de Tecnologías y Servicios de Telecomunicación (UPM)**
 
 El presente proyecto desarrolla una solución orientada a la mejora de la gestión y calidad de los metadatos. El objetivo principal consiste en automatizar la generación de metadatos conforme al estándar europeo DCAT-AP, transformando datos brutos en recursos estructurados, localizables y reutilizables. Para ello, se ha desarrollado una arquitectura basada en un sistema RAG que integra FastAPI, LangChain y Ollama. El sistema realiza un análisis de archivos en formato CSV y JSON para identificar su contenido y generar automáticamente metadatos alineados con el esquema DCAT-AP. 
 
+> **Documentación Completa:** Puedes consultar la guía de instalación y detalles más completos en la [Web de Documentación del Proyecto](https://aitanacuadra.github.io/TFG/).
 
-> **Documentación Completa:** Puedes consultar la guía de instalación y detalles mas completos de mi proyecto en la [Web de Documentación del Proyecto](https://aitanacuadra.github.io/TFG/).
-
-
-
-
+---
 
 ```mermaid
 graph LR
-    %% Definición de estilos
     classDef input fill:#E3F2FD,stroke:#1565C0,stroke-width:2px;
     classDef api fill:#4A148C,color:#fff,stroke:#311B92,stroke-width:2px;
     classDef ai fill:#FF8F00,color:#fff,stroke:#EF6C00,stroke-width:2px;
     classDef audit fill:#2E7D32,color:#fff,stroke:#1B5E20,stroke-width:2px;
+    classDef store fill:#BF360C,color:#fff,stroke:#870000,stroke-width:2px;
     classDef process fill:#F5F5F5,stroke:#616161,stroke-dasharray: 5 5;
 
-    %% Flujo
     User([Usuario]) --> API[FastAPI]
-    
-    subgraph Pipeline ["Pipeline de Procesamiento de Datos"]
+
+    subgraph Pipeline ["Pipeline de Procesamiento"]
         API --> Profiling[Análisis del archivo]
-        Profiling --> RAG[Extracción Semántica]
-        RAG --> DCAT[Generación DCAT-AP]
+        Profiling --> RAG[RAG · Contexto DCAT-AP]
+        RAG --> DCAT[Generación Metadatos DCAT-AP 3.0]
         DCAT --> Judge[Evaluación de Calidad MQA]
     end
-    
-    Judge --> API
-    API --> Output[(Respuesta Final)]
 
-    %% Aplicación de estilos
+    Judge --> Qdrant[(Qdrant · Búsqueda vectorial)]
+    Judge --> SQL[(SQLite)]
+    Judge --> API
+    API --> Output([Respuesta Final])
+
     class User,Output input;
     class API api;
-    class RAG ai;
-    class Judge audit;
+    class RAG,Judge ai;
+    class Qdrant,SQL store;
     class Profiling,DCAT process;
 ```
+
 ---
 
 ## Tecnologías utilizadas
@@ -49,72 +47,97 @@ graph LR
 | API Framework | FastAPI |
 | Procesamiento de datos | Pandas |
 | Orquestación de IA | LangChain |
-| Base de datos vectorial para RAG | FAISS |
-| LLM extracción metadatos | Ollama(gemma3:1b) |
-| LLM as a judge | gemini-3-flash-preview |
+| Base de datos vectorial | Qdrant |
+| LLM generación de metadatos | Ollama · `gemma3:1b` |
+| LLM evaluador (juez) | Google Gemini |
+| Base de datos relacional | SQLite (SQLModel) |
+| Despliegue | Docker · Docker Compose |
 
+---
 
---- 
 ## Instalación
 
-### 1. Prerrequisitos
+### Prerrequisitos
 
-Instalar **Ollama**:  https://ollama.com/download
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y en ejecución.
+- [Ollama](https://ollama.com/download) instalado en el host (corre fuera de Docker para aprovechar la GPU).
 
-Descargar el modelo utilizado:
+Descarga los modelos necesarios:
 
 ```bash
 ollama pull gemma3:1b
+ollama pull nomic-embed-text
 ```
+> Son los modelos predeterminados. Puedes usar cualquier otro modelo disponible en [ollama.com/library](https://ollama.com/library) y cambia `OLLAMA_MODEL` y `EMBEDDINGS_MODEL` en tu `.env`.
 
+### 1. Clonar el repositorio
 
-### 2. Clonar el repositorio
 ```bash
 git clone https://github.com/aitanacuadra/TFG
 cd TFG
 ```
 
-### 3. Crear entorno virtual 
+### 2. Configurar variables de entorno
+
 ```bash
-python -m venv venv
-source venv/bin/activate   # Linux / macOS
-# venv\Scripts\activate    # Windows
+cp .env.example .env
 ```
 
-### 4. Instalar dependencias
+Edita `.env` y sustituye los valores marcados con `<...>`
+
+### 3. Levantar los servicios
+
 ```bash
-pip install -r requirements.txt
+docker compose up --build
 ```
 
-### 5. Configurar variables de entorno
+Esto arranca tres servicios:
+- **API** → http://localhost:8000
+- **Documentación** (Docusaurus) → http://localhost:3000
+- **Qdrant** → http://localhost:6333
 
-Crear un archivo .env:
-```bash
-BASE_DATASET_URL=https://example.org/datasets/
-OLLAMA_HOST=http://localhost:11434
-OLLAMA_MODEL=gemma3:1b
-
-```
-
-### 6. Ejecutar la API
-```bash
-PYTHONPATH=src uvicorn app.main:app --reload
-```
-La API estará disponible en: http://localhost:8000
-
-
+---
 
 ## Uso de la API
+
+Disponible en http://localhost:8000/docs.
+
 ### Endpoint principal
-POST /procesar
+
+**`POST /api/v1/process`**
+
+Sube un archivo CSV o JSON para generar sus metadatos DCAT-AP 3.0, vectorizarlos en Qdrant y evaluarlos con el modelo juez.
+
+**Autenticación:** cabecera `X-API-Key` con el valor de `API_KEY`.
 
 ### Parámetro requerido
-archivo .json o .csv
+Archivo:   
+.json o .csv
 
-# Autora: Aitana Cuadra
+**Respuesta:**
 
+```json
+{
+  "message": "Procesado y vectorizado con éxito",
+  "output_filename": "dataset.csv_meta.json",
+  "metadata": {
+    "@type": "dcat:Dataset",
+    "dct:title": "...",
+    "dct:description": "...",
+    "dcat:keyword": ["...", "..."],
+    ...
+  },
+  "evaluation": {
+    "score_global": 285,
+    "categoria_mqa": "Buena (221-350)",
+    "analisis_detallado": { ... },
+    "mejoras_prioritarias": ["..."]
+  }
+}
+```
 
+---
 
+## Autora
 
-
-
+**Aitana Cuadra** — [GitHub](https://github.com/aitanacuadra)
