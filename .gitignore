@@ -23,6 +23,4 @@ runs.db
 faiss_index/
 data/
 qdrant_data/
-TFG.1.pdf
-.github/
-.claude
+.claude/
