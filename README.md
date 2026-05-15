@@ -1,7 +1,7 @@
-# Automatización de la generación de metadatos DCAT-AP mediante Modelos de Lenguaje de Gran Escala
+# Diseño e implementación de un sistema de generación automatizada de metadatos DCAT-AP basado en Modelos de Lenguaje de Gran Escala (LLMs).
 **Trabajo de Fin de Grado – Ingeniería de Tecnologías y Servicios de Telecomunicación (UPM)**
 
-El presente proyecto desarrolla una solución orientada a la mejora de la gestión y calidad de los metadatos. El objetivo principal consiste en automatizar la generación de metadatos conforme al estándar europeo DCAT-AP, transformando datos brutos en recursos estructurados, localizables y reutilizables. Para ello, se ha desarrollado una arquitectura basada en un sistema RAG que integra FastAPI, LangChain, Ollama y Qdrant. El sistema analiza archivos en formato CSV y JSON para identificar su contenido, generar automáticamente metadatos alineados con el esquema DCAT-AP 3.0 y evaluarlos mediante un LLM-as-a-judge siguiendo la metodología MQA de data.europa.eu.
+El presente proyecto desarrolla una solución orientada a la mejora de la gestión y calidad de los metadatos. El objetivo principal consiste en automatizar la generación de metadatos conforme al estándar europeo DCAT-AP, transformando datos brutos en recursos estructurados, localizables y reutilizables. Para ello, se ha desarrollado una arquitectura basada en un sistema RAG que integra FastAPI, LangChain y Ollama. El sistema realiza un análisis de archivos en formato CSV y JSON para identificar su contenido y generar automáticamente metadatos alineados con el esquema DCAT-AP. 
 
 > **Documentación Completa:** Puedes consultar la guía de instalación y detalles más completos en la [Web de Documentación del Proyecto](https://aitanacuadra.github.io/TFG/).
 
@@ -26,7 +26,7 @@ graph LR
     end
 
     Judge --> Qdrant[(Qdrant · Búsqueda vectorial)]
-    Judge --> SQL[(SQLite · Auditoría)]
+    Judge --> SQL[(SQLite)]
     Judge --> API
     API --> Output([Respuesta Final])
 
@@ -68,8 +68,7 @@ Descarga los modelos necesarios:
 ollama pull gemma3:1b
 ollama pull nomic-embed-text
 ```
-
-> Son los modelos predeterminados. Puedes usar cualquier otro modelo disponible en [ollama.com/library](https://ollama.com/library) cambiando `OLLAMA_MODEL` y `EMBEDDINGS_MODEL` en tu `.env`.
+> Son los modelos predeterminados. Puedes usar cualquier otro modelo disponible en [ollama.com/library](https://ollama.com/library) y cambia `OLLAMA_MODEL` y `EMBEDDINGS_MODEL` en tu `.env`.
 
 ### 1. Clonar el repositorio
 
@@ -94,14 +93,14 @@ docker compose up --build
 
 Esto arranca tres servicios:
 - **API** → http://localhost:8000
-- **Documentación** (Docusaurus) → http://localhost:3000/TFG/
+- **Documentación** (Docusaurus) → http://localhost:3000/TFG
 - **Qdrant** → http://localhost:6333
 
 ---
 
 ## Uso de la API
 
-La documentación interactiva (Swagger UI) está disponible en http://localhost:8000/docs.
+Disponible en http://localhost:8000/docs.
 
 ### Endpoint principal
 
@@ -111,13 +110,9 @@ Sube un archivo CSV o JSON para generar sus metadatos DCAT-AP 3.0, vectorizarlos
 
 **Autenticación:** cabecera `X-API-Key` con el valor de `API_KEY`.
 
-**Ejemplo con `curl`:**
-
-```bash
-curl -X POST http://localhost:8000/api/v1/process \
-  -H "X-API-Key: tu-api-key-secreta" \
-  -F "file=@dataset.csv"
-```
+### Parámetro requerido
+Archivo:   
+.json o .csv
 
 **Respuesta:**
 
