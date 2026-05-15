@@ -24,6 +24,3 @@ faiss_index/
 data/
 qdrant_data/
 .claude/
-
-# PDFs locales
-*.pdf
