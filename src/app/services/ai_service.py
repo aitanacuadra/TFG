@@ -56,8 +56,21 @@ SYSTEM_PROMPT = (
     "{context}\n"
     "----------------------------------\n\n"
     "El JSON debe incluir: 'title', 'description', 'keyword' (lista de strings) y 'theme'. "
+    "Las palabras clave DEBEN ser específicas del dominio del dataset. NUNCA uses términos genéricos como 'dataset', 'data' o 'metadata'. "
+    "El 'theme' debe corresponder al vocabulario oficial de temas de datos de la UE.\n\n"
+    "IMPORTANTE: El siguiente ejemplo muestra ÚNICAMENTE el formato esperado. "
+    "El contenido que generes debe inferirse SIEMPRE del perfil y la muestra del dataset real que recibirás, NUNCA del ejemplo.\n\n"
+    "EJEMPLO DE FORMATO (no copies el contenido):\n"
+    "Dataset: columnas ['municipio', 'fecha', 'lluvia_mm', 'temperatura_max', 'temperatura_min']\n"
+    "JSON resultante:\n"
+    "{{\n"
+    "  \"title\": \"Datos meteorológicos diarios por municipio\",\n"
+    "  \"description\": \"Registros diarios de temperatura y precipitaciones por municipio español.\",\n"
+    "  \"keyword\": [\"meteorología\", \"temperatura\", \"precipitación\", \"municipio\", \"clima\"],\n"
+    "  \"theme\": \"http://publications.europa.eu/resource/authority/data-theme/ENVI\"\n"
+    "}}\n\n"
     "Responde SIEMPRE en español y devuelve exclusivamente JSON válido."
-) 
+)
 
 def generate_embeddings(text: str) -> list[float]:
     """

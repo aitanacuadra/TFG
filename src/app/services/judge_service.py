@@ -1,8 +1,14 @@
+import re
 import json
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from app.core.config import settings
+
+def _parse_llm_json(text: str) -> dict:
+    text = re.sub(r'```json\s*|\s*```', '', text).strip()
+    text = re.sub(r',\s*([}\]])', r'\1', text)
+    return json.loads(text)
 
 
 judge_llm = ChatGoogleGenerativeAI(
@@ -60,8 +66,6 @@ METADATOS GENERADOS (JSON-LD):
 """)
 ])
 
-parser = JsonOutputParser()
-
 def evaluate_metadata_with_gemini(profile: dict, sample_csv: str, metadata: dict) -> dict:
     if not settings.GEMINI_API_KEY:
         return {
@@ -70,9 +74,10 @@ def evaluate_metadata_with_gemini(profile: dict, sample_csv: str, metadata: dict
             "analisis_fair": "Falta configuración de API Key."
         }
 
-    chain = JUDGE_PROMPT | judge_llm | parser
-    return chain.invoke({
+    chain = JUDGE_PROMPT | judge_llm | StrOutputParser()
+    raw = chain.invoke({
         "profile": profile,
         "sample": sample_csv,
         "metadata": metadata
     })
+    return _parse_llm_json(raw)

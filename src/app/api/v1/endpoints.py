@@ -21,8 +21,8 @@ class PromptIn(BaseModel):
 @router.post(
     "/process",
     response_model=ProcessFileResponse,  
-    summary="Procesa un archivo, genera metadatos DCAT y los vectoriza",
-    description="Sube un CSV o JSON para obtener sus metadatos compatibles con DCAT-AP y almacenarlos en Qdrant para búsqueda semántica."
+    summary="Procesa un archivo, genera metadatos DCAT-AP y los evalua",
+    description="Sube un CSV o JSON para obtener sus metadatos compatibles con DCAT-AP"
 ) 
 async def process_file(
     file: UploadFile = File(...),
@@ -59,7 +59,8 @@ async def process_file(
             df=df,
             filename=file.filename or "dataset",
             content_type=file.content_type or "application/octet-stream",
-            file_size_bytes=len(content)
+            file_size_bytes=len(content),
+            file_format=file_format
         )
         
         # 5. Evaluación de Calidad (LLM-as-a-judge)

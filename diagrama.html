@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 30px; background: white; font-family: Arial, sans-serif; }
+</style>
+</head>
+<body>
+<svg width="870" height="235" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#555"/>
+    </marker>
+    <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#999"/>
+    </marker>
+  </defs>
+
+  <!-- Pipeline container -->
+  <rect x="195" y="28" width="582" height="92" rx="8" fill="#FFFDE7" stroke="#CCC9A0" stroke-width="1.5"/>
+  <text x="486" y="44" text-anchor="middle" font-size="10" fill="#888">Pipeline de Procesamiento de Datos</text>
+
+  <!-- Usuario -->
+  <ellipse cx="48" cy="74" rx="38" ry="21" fill="#D6EAF8" stroke="#7DB3D5" stroke-width="1.5"/>
+  <text x="48" y="78" text-anchor="middle" font-size="11" fill="#2C3E50">Usuario</text>
+
+  <!-- Usuario → FastAPI -->
+  <line x1="86" y1="74" x2="102" y2="74" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- FastAPI -->
+  <rect x="103" y="50" width="80" height="50" rx="6" fill="#5C4FC0"/>
+  <text x="143" y="79" text-anchor="middle" font-size="13" font-weight="bold" fill="white">FastAPI</text>
+
+  <!-- FastAPI → Pipeline -->
+  <line x1="183" y1="74" x2="198" y2="74" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- Step 1: Análisis del archivo -->
+  <rect x="204" y="51" width="112" height="46" rx="5" fill="white" stroke="#AAAAAA" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="260" y="71" text-anchor="middle" font-size="10" fill="#333">Análisis del</text>
+  <text x="260" y="86" text-anchor="middle" font-size="10" fill="#333">archivo</text>
+
+  <!-- 1 → 2 -->
+  <line x1="316" y1="74" x2="329" y2="74" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- Step 2: Extracción Semántica -->
+  <rect x="330" y="51" width="112" height="46" rx="5" fill="#E07B09"/>
+  <text x="386" y="71" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Extracción</text>
+  <text x="386" y="86" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Semántica</text>
+
+  <!-- 2 → 3 -->
+  <line x1="442" y1="74" x2="455" y2="74" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- Step 3: Generación DCAT-AP -->
+  <rect x="456" y="51" width="112" height="46" rx="5" fill="white" stroke="#AAAAAA" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="512" y="71" text-anchor="middle" font-size="10" fill="#333">Generación</text>
+  <text x="512" y="86" text-anchor="middle" font-size="10" fill="#333">DCAT-AP</text>
+
+  <!-- 3 → 4 -->
+  <line x1="568" y1="74" x2="581" y2="74" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- Step 4: Evaluación de Calidad MQA -->
+  <rect x="582" y="51" width="186" height="46" rx="5" fill="#2D8B50"/>
+  <text x="675" y="71" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Evaluación de</text>
+  <text x="675" y="86" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Calidad MQA</text>
+
+  <!-- FastAPI → Respuesta Final -->
+  <line x1="143" y1="100" x2="143" y2="163" stroke="#555" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- Respuesta Final (cylinder) -->
+  <ellipse cx="143" cy="172" rx="44" ry="11" fill="#E8E8E8" stroke="#999" stroke-width="1.5"/>
+  <rect x="99" y="172" width="88" height="30" fill="#E8E8E8"/>
+  <line x1="99" y1="172" x2="99" y2="202" stroke="#999" stroke-width="1.5"/>
+  <line x1="187" y1="172" x2="187" y2="202" stroke="#999" stroke-width="1.5"/>
+  <ellipse cx="143" cy="202" rx="44" ry="11" fill="#D4D4D4" stroke="#999" stroke-width="1.5"/>
+  <text x="143" y="191" text-anchor="middle" font-size="10" fill="#444">Respuesta Final</text>
+
+  <!-- FastAPI → SQLite (dashed, izquierda) -->
+  <line x1="103" y1="84" x2="52" y2="84" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="52" y1="84" x2="52" y2="163" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar2)"/>
+
+  <!-- SQLite (cylinder) -->
+  <ellipse cx="52" cy="172" rx="36" ry="10" fill="#BDBDBD" stroke="#888" stroke-width="1.5"/>
+  <rect x="16" y="172" width="72" height="28" fill="#BDBDBD"/>
+  <line x1="16" y1="172" x2="16" y2="200" stroke="#888" stroke-width="1.5"/>
+  <line x1="88" y1="172" x2="88" y2="200" stroke="#888" stroke-width="1.5"/>
+  <ellipse cx="52" cy="200" rx="36" ry="10" fill="#ADADAD" stroke="#888" stroke-width="1.5"/>
+  <text x="52" y="191" text-anchor="middle" font-size="10" fill="#333">SQLite</text>
+
+  <!-- Qdrant (bajo Extracción Semántica, x=386) -->
+  <line x1="386" y1="120" x2="386" y2="167" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar2)"/>
+  <rect x="330" y="167" width="112" height="44" rx="5" fill="#0077B6"/>
+  <text x="386" y="186" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Qdrant</text>
+  <text x="386" y="200" text-anchor="middle" font-size="9" fill="#BEE0F5">(RAG · base vectorial)</text>
+
+  <!-- Ollama (bajo Generación DCAT-AP, x=512) -->
+  <line x1="512" y1="120" x2="512" y2="167" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar2)"/>
+  <rect x="453" y="167" width="118" height="44" rx="5" fill="#37474F"/>
+  <text x="512" y="186" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Ollama</text>
+  <text x="512" y="200" text-anchor="middle" font-size="9" fill="#CFD8DC">(Gemma 3 · 1B · host)</text>
+
+  <!-- Gemini (bajo Evaluación MQA, x=675) -->
+  <line x1="675" y1="120" x2="675" y2="167" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar2)"/>
+  <rect x="613" y="167" width="124" height="44" rx="5" fill="#1A73E8"/>
+  <text x="675" y="186" text-anchor="middle" font-size="10" font-weight="bold" fill="white">Gemini API</text>
+  <text x="675" y="200" text-anchor="middle" font-size="9" fill="#C8DEFF">(LLM-as-a-Judge)</text>
+
+</svg>
+</body>
+</html>

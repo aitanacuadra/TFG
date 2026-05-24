@@ -54,7 +54,14 @@ def _normalize_llm_variables(variables_raw: Any) -> Dict[str, Dict[str, Any]]:
             var_info[str(name)] = {"llm_type": vtype, "description": None}
     return var_info
 
-def _determine_distribution_format(content_type: str) -> Tuple[str, str]:
+def _determine_distribution_format(content_type: str, file_format: Optional[str] = None) -> Tuple[str, str]:
+    # Priorizamos el formato detectado por Pandas sobre el content_type declarado por el cliente
+    fmt = (file_format or "").lower()
+    if fmt == "csv":
+        return "text/csv", "csv"
+    if fmt == "json":
+        return "application/json", "json"
+    # Fallback al content_type si no hay formato detectado
     ct = (content_type or "").lower()
     if "csv" in ct:
         return "text/csv", "csv"
@@ -87,6 +94,7 @@ def build_dcat3_metadata(
     content_type: str,
     file_size_bytes: int,
     dataset_id: Optional[str] = None,
+    file_format: Optional[str] = None,
 ) -> Dict[str, Any]:
     
     # 1. Extracción de datos básicos y SEMÁNTICOS (LLM)
@@ -109,7 +117,7 @@ def build_dcat3_metadata(
 
     # 4. Procesamiento de detalles técnicos estructurales
     var_info = _normalize_llm_variables(raw_meta.get("variables"))
-    dist_format, dist_suffix = _determine_distribution_format(content_type)
+    dist_format, dist_suffix = _determine_distribution_format(content_type, file_format)
     variable_measured = _build_measured_variables(df, var_info)
 
     # 5. Ensamblaje final del JSON-LD estricto
