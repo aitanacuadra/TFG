@@ -2,7 +2,6 @@
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
-# --- Estructura para los metadatos DCAT-AP (Gemma) ---
 
 class DCATDistribution(BaseModel):
     type_: str = Field(alias="@type", default="dcat:Distribution")
@@ -55,10 +54,9 @@ class MQAAnalysisDetail(BaseModel):
 class MQAEvaluation(BaseModel):
     score_global: int
     categoria_mqa: str
-    analisis_detallado: MQAAnalysisDetail  # Cambiado para coincidir con el prompt
+    analisis_detallado: MQAAnalysisDetail  
     mejoras_prioritarias: List[str]
 
-# --- La respuesta final de la API ---
 
 class ProcessFileResponse(BaseModel):
     message: str

@@ -38,22 +38,20 @@ async def process_file(
     if not content:
         raise HTTPException(status_code=400, detail="Archivo vacío")
    
-    # 1. Registro de auditoría relacional (SQL)
     run = Run(endpoint="/process", filename=file.filename, content_type=file.content_type, size_bytes=len(content))
     db.add(run)
     db.commit()
     db.refresh(run)
 
     try:
-        # 2. Ingesta y Profiling (con la poda optimizada que hicimos)
         df, file_format = file_service.sniff_dataframe(content, file.content_type or "")
         profile = file_service.dataframe_profile(df)
         sample = file_service.head_as_csv(df)
         
-        # 3. Generación Generativa de Metadatos
+        
         metadata_raw = ai_service.generate_metadata_with_langchain(profile, sample)
         
-        # 4. Alineación a DCAT-AP
+        
         metadata_dcat = metadata_service.build_dcat3_metadata(
             raw_meta=metadata_raw,
             df=df,
@@ -63,28 +61,26 @@ async def process_file(
             file_format=file_format
         )
         
-        # 5. Evaluación de Calidad (LLM-as-a-judge)
+        
         judge_result = judge_service.evaluate_metadata_with_gemini(
             profile=profile,
             sample_csv=sample,
             metadata=metadata_dcat
         )   
        
-        # 6. NUEVO: Vectorización e Inserción en Qdrant
-        # Concatenamos los campos semánticos clave para crear el embedding
         text_to_embed = f"{metadata_dcat.get('title', '')} {metadata_dcat.get('description', '')} {' '.join(metadata_dcat.get('keyword', []))}"
         
-        # Obtenemos el vector de nomic-embed-text
+        
         embedding_vector = ai_service.generate_embeddings(text_to_embed)
         
-        # Guardamos en Qdrant enviando el vector y el Payload (los metadatos completos)
+        
         qdrant_service.upsert_dataset(
             vector=embedding_vector,
-            payload=metadata_dcat, # ¡El payload es tu DCAT-AP!
-            dataset_id=str(run.id) # Usamos el ID de la base de datos SQL para enlazarlos
+            payload=metadata_dcat, 
+            dataset_id=str(run.id) 
         )
         
-        # 7. Actualización final en la base de datos relacional
+        
         db.add(RunMetadata(
             run_id=run.id,
             metadata_json=json.dumps(metadata_dcat, ensure_ascii=False),
@@ -102,7 +98,7 @@ async def process_file(
         }
     
     except Exception as e:
-        # Manejo de errores nivel profesional
+        
         logger.error(f"Error procesando el archivo {file.filename} en el Run {run.id}: {str(e)}", exc_info=True)
         
         run.status = "failed"

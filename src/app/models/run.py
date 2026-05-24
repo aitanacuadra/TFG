@@ -4,7 +4,6 @@ from sqlmodel import SQLModel, Field
 
 class Run(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    # Corrección A: Uso correcto y moderno de zonas horarias UTC
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc), 
         nullable=False

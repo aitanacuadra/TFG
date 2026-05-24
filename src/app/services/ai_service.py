@@ -9,12 +9,10 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 
 from app.core.config import settings
 
-# Configuramos el logger profesional
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 logger.info("Inicializando modelos LLM y Embeddings...")
 
-# 1. INYECTAMOS LA URL A LOS COMPONENTES DE LANGCHAIN (Usando estrictamente Pydantic Settings)
 embeddings_model = OllamaEmbeddings(
     model=settings.EMBEDDINGS_MODEL, 
     base_url=settings.OLLAMA_BASE_URL
@@ -24,16 +22,14 @@ llm = ChatOllama(
     model=settings.OLLAMA_MODEL, 
     temperature=0, 
     base_url=settings.OLLAMA_BASE_URL,
-    format="json" # Forzamos la salida estructurada
+    format="json" 
 )
 
-# 2. INICIALIZACIÓN ROBUSTA DE QDRANT
 retriever = None
 try:
     logger.info(f"Conectando al motor vectorial Qdrant en {settings.QDRANT_URL}...")
     client = QdrantClient(url=settings.QDRANT_URL)
     
-    # Verificamos si la colección existe; si no, el retriever quedará desactivado hasta que se ingeste la normativa
     if client.collection_exists(settings.QDRANT_COLLECTION):
         vectorstore = QdrantVectorStore(
             client=client,
@@ -47,7 +43,6 @@ try:
 except Exception as e:
     logger.error(f"Fallo crítico al conectar con Qdrant: {e}")
 
-# 3. PROMPT ENGINEERING ESTRICTO
 SYSTEM_PROMPT = (
     "Eres un ingeniero de datos experto en la normativa europea DCAT-AP. "
     "Tu tarea es generar UN ÚNICO objeto JSON con metadatos a partir del perfil estructural de un dataset y una muestra de datos. "
@@ -56,19 +51,6 @@ SYSTEM_PROMPT = (
     "{context}\n"
     "----------------------------------\n\n"
     "El JSON debe incluir: 'title', 'description', 'keyword' (lista de strings) y 'theme'. "
-    "Las palabras clave DEBEN ser específicas del dominio del dataset. NUNCA uses términos genéricos como 'dataset', 'data' o 'metadata'. "
-    "El 'theme' debe corresponder al vocabulario oficial de temas de datos de la UE.\n\n"
-    "IMPORTANTE: El siguiente ejemplo muestra ÚNICAMENTE el formato esperado. "
-    "El contenido que generes debe inferirse SIEMPRE del perfil y la muestra del dataset real que recibirás, NUNCA del ejemplo.\n\n"
-    "EJEMPLO DE FORMATO (no copies el contenido):\n"
-    "Dataset: columnas ['municipio', 'fecha', 'lluvia_mm', 'temperatura_max', 'temperatura_min']\n"
-    "JSON resultante:\n"
-    "{{\n"
-    "  \"title\": \"Datos meteorológicos diarios por municipio\",\n"
-    "  \"description\": \"Registros diarios de temperatura y precipitaciones por municipio español.\",\n"
-    "  \"keyword\": [\"meteorología\", \"temperatura\", \"precipitación\", \"municipio\", \"clima\"],\n"
-    "  \"theme\": \"http://publications.europa.eu/resource/authority/data-theme/ENVI\"\n"
-    "}}\n\n"
     "Responde SIEMPRE en español y devuelve exclusivamente JSON válido."
 )
 
@@ -78,7 +60,6 @@ def generate_embeddings(text: str) -> list[float]:
     Vital para insertar en Qdrant de forma manual.
     """
     try:
-        # Usamos el modelo de Langchain directamente para embeddir la query
         return embeddings_model.embed_query(text)
     except Exception as e:
         logger.error(f"Error al generar embeddings: {e}")
@@ -90,8 +71,6 @@ def generate_metadata_with_langchain(profile: dict, sample_csv: str) -> dict:
         
     logger.info("Consultando la normativa DCAT-AP en Qdrant...")
     query_busqueda = "Propiedades obligatorias y recomendadas de DCAT-AP para describir conjuntos de datos (datasets)."
-    
-    # RAG: Recuperación de documentos
     docs_recuperados = retriever.invoke(query_busqueda)
     contexto_normativo = "\n\n".join([doc.page_content for doc in docs_recuperados])
     

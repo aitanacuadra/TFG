@@ -55,13 +55,11 @@ def _normalize_llm_variables(variables_raw: Any) -> Dict[str, Dict[str, Any]]:
     return var_info
 
 def _determine_distribution_format(content_type: str, file_format: Optional[str] = None) -> Tuple[str, str]:
-    # Priorizamos el formato detectado por Pandas sobre el content_type declarado por el cliente
     fmt = (file_format or "").lower()
     if fmt == "csv":
         return "text/csv", "csv"
     if fmt == "json":
         return "application/json", "json"
-    # Fallback al content_type si no hay formato detectado
     ct = (content_type or "").lower()
     if "csv" in ct:
         return "text/csv", "csv"
@@ -97,13 +95,11 @@ def build_dcat3_metadata(
     file_format: Optional[str] = None,
 ) -> Dict[str, Any]:
     
-    # 1. Extracción de datos básicos y SEMÁNTICOS (LLM)
     title = raw_meta.get("title") or filename
     description = raw_meta.get("description") or "Dataset generado automáticamente."
     notes = raw_meta.get("notes") or ""
-    
-    # 2. Priorizamos la inteligencia del LLM para Keywords y Theme
     llm_keywords = raw_meta.get("keyword") or raw_meta.get("keywords")
+
     if isinstance(llm_keywords, list) and len(llm_keywords) > 0:
         keywords = [str(k).lower() for k in llm_keywords]
     else:
@@ -111,16 +107,16 @@ def build_dcat3_metadata(
         
     theme = raw_meta.get("theme") or "http://publications.europa.eu/resource/authority/data-theme/TECH"
     
-    # 3. Generación de ID
+    
     if not dataset_id:
         dataset_id = slugify(Path(filename).stem)
 
-    # 4. Procesamiento de detalles técnicos estructurales
+    
     var_info = _normalize_llm_variables(raw_meta.get("variables"))
     dist_format, dist_suffix = _determine_distribution_format(content_type, file_format)
     variable_measured = _build_measured_variables(df, var_info)
 
-    # 5. Ensamblaje final del JSON-LD estricto
+    
     return {
         "@context": {
             "dcat": "http://www.w3.org/ns/dcat#",
@@ -136,7 +132,6 @@ def build_dcat3_metadata(
         "dcat:theme": theme, 
         "dct:identifier": filename,
         "dct:language": "es",
-        # ¡AQUÍ ESTÁ LA MAGIA! Añadimos los campos que Pydantic echaba de menos
         "dct:type": "http://purl.org/dc/dcmitype/Dataset", 
         "dct:format": dist_format,
         "dcat:keyword": keywords,
@@ -145,7 +140,6 @@ def build_dcat3_metadata(
                 "@type": "dcat:Distribution",
                 "@id": f"{settings.BASE_DATASET_URL}/{dataset_id}/distribution/{dist_suffix}",
                 "dct:title": f"Distribución de {title}",
-                # ¡Y AQUÍ LA DESCRIPCIÓN DE LA DISTRIBUCIÓN!
                 "dct:description": notes or f"Archivo de datos descargable: {filename}",
                 "dct:format": dist_format,
                 "dcat:mediaType": content_type or "application/octet-stream",

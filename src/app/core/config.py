@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     BASE_DATASET_URL: str = "https://example.org/dataset"
     BASE_DOWNLOAD_URL: str = "https://example.org/datasets"
     
-    # --- Modelos Cloud (Evaluador / Juez) ---
+    # --- Modelos Cloud  ---
     GEMINI_API_KEY: str = Field(default="", description="Token para acceder a Gemini API")
     GEMINI_MODEL: str = Field(default="gemini-3-flash-preview", description="Modelo usado en judge_service")
     
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     # --- RAG y Contexto ---
     RAG_DOC_PATH: str = Field(default="src/data/docs/dcat_ap.html", description="Documento base para RAG")
 
-    # Configuración de Pydantic: extra='ignore' evita errores si hay variables de más en el .env
+    # Configuración de Pydantic
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
 settings = Settings()
