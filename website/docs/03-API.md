@@ -64,19 +64,19 @@ curl -X POST http://localhost:8000/api/v1/process \
 
 ## Puntuación MQA
 
-La evaluación sigue la metodología [MQA de data.europa.eu](https://data.europa.eu/mqa/methodology) con cinco dimensiones:
+La evaluación sigue la metodología [MQA de data.europa.eu](https://data.europa.eu/mqa/methodology) con cinco dimensiones (máximo **405 puntos**):
 
 | Dimensión | Máx. puntos | Qué evalúa |
 |-----------|-------------|------------|
-| Findability | 100 | Palabras clave, temas, localización y temporalidad |
-| Accessibility | 100 | Presencia y accesibilidad de `accessURL` y `downloadURL` |
-| Interoperability | 130 | Formatos abiertos y conformidad con DCAT-AP 3.0 |
-| Reusability | 75 | Licencia, contacto, editor y restricciones de acceso |
-| Contextuality | 20 | Derechos, tamaño del archivo y fechas |
+| Findability | 100 | Palabras clave (`dcat:keyword`), tema (`dcat:theme`), cobertura geográfica y temporal |
+| Accessibility | 100 | Presencia y accesibilidad HTTP de `dcat:accessURL` y `dcat:downloadURL` |
+| Interoperability | 110 | Formatos abiertos (`dct:format`, `dcat:mediaType`) y conformidad DCAT-AP 3.0 via SHACL |
+| Reusability | 75 | Licencia, contacto (`dcat:contactPoint`), editor (`dct:publisher`) y restricciones de acceso |
+| Contextuality | 20 | Derechos (`dct:rights`), tamaño del archivo (`dcat:byteSize`) y fechas de publicación |
 
 | Categoría | Rango |
 |-----------|-------|
-| Excelente | 351 – 425 |
+| Excelente | 351 – 405 |
 | Buena | 221 – 350 |
 | Suficiente | 121 – 220 |
 | Mala | 0 – 120 |

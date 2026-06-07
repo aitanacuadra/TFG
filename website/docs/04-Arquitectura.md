@@ -5,7 +5,36 @@ title: Arquitectura
 
 # Arquitectura del sistema
 
-El proyecto sigue una arquitectura de servicios desacoplados orquestados con Docker Compose. Cada responsabilidad está aislada en su propio módulo dentro de `src/app/`.
+El sistema sigue una arquitectura de microservicios orquestada con Docker Compose. Cada responsabilidad está aislada en su propio módulo, lo que facilita el mantenimiento y la escalabilidad: cambiar el modelo de lenguaje, la base de datos vectorial o el evaluador no requiere tocar el resto del pipeline.
+
+---
+
+## Infraestructura y contenedores Docker
+
+El entorno de despliegue define tres servicios Docker. Para generar metadatos solo son necesarios `api` y `qdrant`; el contenedor `docs` es opcional y sirve únicamente para el desarrollo local de la documentación.
+
+![Diagrama de infraestructura y contenedores Docker](/img/figura6-docker.png)
+
+*Figura 6: Diagrama de infraestructura y contenedores Docker.*
+
+- **`api`** — Núcleo de la aplicación. Ejecuta el servidor FastAPI, coordina todo el pipeline y devuelve los metadatos DCAT-AP junto con su evaluación de calidad. Se comunica con Qdrant (dentro de Docker) y con Ollama (en el host) via `host.docker.internal`.
+- **`qdrant`** — Base de datos vectorial que almacena dos colecciones: los fragmentos de la normativa DCAT-AP (para el RAG) y los metadatos generados de cada dataset procesado. Los datos persisten en el volumen `/qdrant_data`.
+- **`docs`** — Web de documentación construida con Docusaurus. En local se levanta en el puerto 3000; en producción se despliega como sitio estático en GitHub Pages.
+- **Ollama (HOST)** — Se ejecuta fuera de Docker porque necesita acceso directo al procesador. Sirve tanto el modelo de generación (`gemma3:1b`) como el de embeddings (`nomic-embed-text`).
+
+---
+
+## Capas lógicas
+
+El pipeline se organiza en cinco capas que transforman progresivamente el archivo de entrada en metadatos estructurados y evaluados:
+
+![Flujo por capas](/img/figura7-capas.png)
+
+*Figura 7: Flujo por capas.*
+
+---
+
+## Estructura del proyecto
 
 ```
 src/
@@ -24,75 +53,53 @@ src/
     │   └── session.py       # Conexión y sesión SQLite
     └── services/
         ├── file_service.py      # Ingesta y profiling de archivos
-        ├── ai_service.py        # LLM + embeddings + RAG (Ollama)
+        ├── ai_service.py        # LLM + embeddings + RAG (Ollama/LangChain)
         ├── metadata_service.py  # Construcción del JSON-LD DCAT-AP
         ├── judge_service.py     # Evaluación de calidad (Gemini)
-        └── qdrant_service.py    # Inserción de vectores en Qdrant
+        ├── qdrant_service.py    # Inserción de vectores en Qdrant
+        └── rag_service.py       # Inicialización de la base de datos RAG
 ```
 
 ---
 
 ## Servicios
 
-### `file_service` — Ingesta y profiling
+### `file_service` — Ingesta y perfilado
 
-Lee el archivo subido (CSV o JSON), detecta automáticamente codificación y separadores, y genera un perfil estructural del dataset:
+Lee el archivo subido y determina automáticamente si es un CSV o un JSON, qué codificación usa y, en el caso del CSV, qué separador de columnas tiene. Para evitar problemas con archivos grandes, el análisis se limita siempre a las primeras 100 filas.
 
-- Número de filas y columnas
-- Tipos de datos por columna
-- Conteo de valores nulos
-- Ejemplos de valores reales
-
-Para archivos grandes, aplica una poda limitando el análisis a las primeras 100 filas, evitando problemas de memoria.
+El resultado es un **perfil estructural** con los nombres de columna, los tipos de datos traducidos al estándar XSD, los valores nulos por columna y ejemplos representativos. Junto con una muestra de las primeras filas, es lo que recibe el modelo de lenguaje en el siguiente paso.
 
 ---
 
 ### `ai_service` — RAG y generación de metadatos
 
-Implementa el pipeline RAG completo:
+Coordina el proceso completo de generación usando LangChain. Cuando llega una petición, consulta la base de conocimiento normativa en Qdrant para recuperar los fragmentos más relevantes de la especificación DCAT-AP. Con ese contexto, el perfil del dataset y la muestra de datos, construye el prompt y llama al modelo local (Ollama · Gemma 3) para que genere los metadatos en formato JSON.
 
-1. Conecta con Qdrant y carga el retriever sobre la colección `dcat_metadata` (normativa DCAT-AP previamente ingestada).
-2. Lanza una consulta semántica para recuperar los fragmentos normativos más relevantes.
-3. Construye el prompt combinando el contexto normativo, el perfil del dataset y una muestra de datos.
-4. Invoca el LLM local (Ollama · `gemma3:1b`) para generar el JSON de metadatos.
-5. Expone también `generate_embeddings()` para vectorizar los metadatos generados antes de insertarlos en Qdrant.
+Si Qdrant no está disponible al arrancar, el servidor continúa funcionando pero avisa del problema cuando llega la primera petición.
 
 ---
 
 ### `metadata_service` — Construcción DCAT-AP 3.0
 
-Toma la salida cruda del LLM y la alinea con el esquema DCAT-AP 3.0, produciendo un JSON-LD válido con:
-
-- Campos obligatorios: `dct:title`, `dct:description`, `dcat:keyword`, `dcat:theme`
-- Distribución: formato, mediaType, byteSize, downloadURL
-- Variables medidas: tipo XSD inferido por columna (`xsd:integer`, `xsd:decimal`, `xsd:dateTime`…)
-- Proveniencia: indica que los metadatos fueron generados por IA
+Toma la respuesta JSON del modelo y la convierte en un documento JSON-LD válido conforme a DCAT-AP 3.0. Completa los campos obligatorios (`dct:title`, `dct:description`, `dcat:keyword`, `dcat:theme`), añade la información de la distribución del archivo e incluye una entrada por cada columna del dataset con su tipo de dato. También deja constancia de que los metadatos fueron generados por IA.
 
 ---
 
-### `judge_service` — Evaluación de calidad (LLM-as-a-judge)
+### `judge_service` — Evaluación de calidad
 
-Usa Google Gemini como juez externo para evaluar los metadatos generados siguiendo la metodología MQA de data.europa.eu. Devuelve una puntuación global y un análisis por dimensión con recomendaciones de mejora.
+Envía los metadatos generados a Google Gemini, que actúa como juez externo y los puntúa según la metodología MQA de data.europa.eu: hasta 405 puntos repartidos en cinco dimensiones, junto con recomendaciones de mejora. Se usa un modelo diferente al de la generación para que la evaluación sea imparcial.
+
+Si no hay clave de Gemini configurada, devuelve una evaluación vacía y el proceso continúa sin interrumpirse.
 
 ---
 
 ### `qdrant_service` — Almacenamiento vectorial
 
-Inserta los metadatos en Qdrant como un punto vectorial:
-
-- **Vector:** embedding del título + descripción + palabras clave (modelo `nomic-embed-text`).
-- **Payload:** el JSON-LD DCAT-AP completo.
-- **ID:** UUID determinista derivado del ID de auditoría en SQLite, manteniendo la trazabilidad entre ambas bases de datos.
+Guarda los metadatos generados en Qdrant como un vector numérico, lo que permite búsquedas semánticas posteriores. El vector se obtiene a partir del título, la descripción y las palabras clave del dataset.
 
 ---
 
-## Almacenamiento dual
+### `rag_service` — Inicialización de la base normativa
 
-El sistema persiste la información en dos capas complementarias:
-
-| Capa | Tecnología | Propósito |
-|------|-----------|-----------|
-| Relacional | SQLite (SQLModel) | Auditoría: quién subió qué, cuándo y con qué resultado |
-| Vectorial | Qdrant | Búsqueda semántica sobre los metadatos generados |
-
-Ambos registros se enlazan mediante el mismo ID, permitiendo trazabilidad completa de cada ejecución.
+Prepara la base de conocimiento que usa el sistema para generar metadatos correctos. Carga la especificación oficial DCAT-AP, la divide en fragmentos pequeños, convierte cada fragmento en un vector numérico y los almacena en Qdrant. Este proceso solo hay que ejecutarlo una vez: a partir de ahí, cada vez que llega una petición el sistema puede consultar esa base para recuperar el contexto normativo relevante.

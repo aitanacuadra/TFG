@@ -8,7 +8,7 @@ title: Instalación
 ## Prerrequisitos
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y en ejecución.
-- [Ollama](https://ollama.com/download) instalado en el host (corre fuera de Docker para aprovechar la GPU).
+- [Ollama](https://ollama.com/download) instalado en el host (se ejecuta fuera de Docker porque necesita acceso directo al procesador de la máquina).
 
 Descarga los modelos necesarios:
 

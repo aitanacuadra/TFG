@@ -4,42 +4,18 @@ slug: /
 title: Introducción
 ---
 
-# Diseño e implementación de un sistema de generación automatizada de metadatos DCAT-AP basado en Modelos de Lenguaje de Gran Escala (LLMs).
-**Trabajo de Fin de Grado – Ingeniería de Tecnologías y Servicios de Telecomunicación (UPM)**
+# Diseño e implementación de un sistema de generación automatizada de metadatos DCAT-AP basado en Modelos de Lenguaje de Gran Escala (LLMs)
 
-El presente proyecto desarrolla una solución orientada a la mejora de la gestión y calidad de los metadatos. El objetivo principal consiste en automatizar la generación de metadatos conforme al estándar europeo DCAT-AP, transformando datos brutos en recursos estructurados, localizables y reutilizables. Para ello, se ha desarrollado una arquitectura basada en un sistema RAG que integra FastAPI, LangChain y Ollama. El sistema realiza un análisis de archivos en formato CSV y JSON para identificar su contenido y generar automáticamente metadatos alineados con el esquema DCAT-AP.
+**Trabajo de Fin de Grado – Ingeniería de Tecnologías y Servicios de Telecomunicación (UPM)**  
+**Aitana Cuadra Cano**
+
+El sistema automatiza la catalogación de archivos CSV y JSON generando metadatos conformes al estándar europeo DCAT-AP 3.0. Se basa en una arquitectura RAG que proporciona al modelo de lenguaje el contexto normativo necesario —extraído de la especificación oficial DCAT-AP— para que genere metadatos estructurados alineados con el estándar. La calidad del resultado se evalúa automáticamente con la metodología MQA de data.europa.eu.
 
 ---
 
-```mermaid
-graph LR
-    classDef input fill:#E3F2FD,stroke:#1565C0,stroke-width:2px;
-    classDef api fill:#4A148C,color:#fff,stroke:#311B92,stroke-width:2px;
-    classDef ai fill:#FF8F00,color:#fff,stroke:#EF6C00,stroke-width:2px;
-    classDef audit fill:#2E7D32,color:#fff,stroke:#1B5E20,stroke-width:2px;
-    classDef store fill:#BF360C,color:#fff,stroke:#870000,stroke-width:2px;
-    classDef process fill:#F5F5F5,stroke:#616161,stroke-dasharray: 5 5;
+![Arquitectura general del sistema y flujo de datos](/img/figura5-arquitectura.png)
 
-    User([Usuario]) --> API[FastAPI]
-
-    subgraph Pipeline ["Pipeline de Procesamiento"]
-        API --> Profiling[Análisis del archivo]
-        Profiling --> RAG[RAG · Contexto DCAT-AP]
-        RAG --> DCAT[Generación Metadatos DCAT-AP 3.0]
-        DCAT --> Judge[Evaluación de Calidad MQA]
-    end
-
-    Judge --> Qdrant[(Qdrant · Búsqueda vectorial)]
-    Judge --> SQL[(SQLite)]
-    Judge --> API
-    API --> Output([Respuesta Final])
-
-    class User,Output input;
-    class API api;
-    class RAG,Judge ai;
-    class Qdrant,SQL store;
-    class Profiling,DCAT process;
-```
+*Figura 5: Arquitectura general del sistema y flujo de datos.*
 
 ---
 
@@ -59,10 +35,14 @@ graph LR
 
 ---
 
-## Fases del pipeline
+## Capas del pipeline
 
-1. **Análisis del archivo** — Pandas lee el CSV o JSON, detecta codificación y separadores, y genera un perfil estructural con tipos de columnas, valores nulos y ejemplos.
-2. **RAG · Contexto DCAT-AP** — Se recuperan fragmentos relevantes de la normativa DCAT-AP 3.0 almacenada en Qdrant para enriquecer el prompt del LLM.
-3. **Generación de metadatos** — El LLM local (Ollama) genera un JSON-LD con los campos DCAT-AP: título, descripción, palabras clave, tema y variables medidas.
-4. **Evaluación de calidad MQA** — Google Gemini actúa como juez y puntúa los metadatos según las cinco dimensiones de la metodología MQA de data.europa.eu: findability, accessibility, interoperability, reusability y contextuality.
-5. **Almacenamiento dual** — Los metadatos se vectorizan y guardan en Qdrant para búsqueda semántica; el registro de auditoría se persiste en SQLite.
+1. **Ingesta y validación** — FastAPI recibe la petición. Pydantic verifica la API Key en la cabecera `X-API-Key`, que el archivo no supera los 10 MB y que no está vacío. Si pasa todas las comprobaciones, se registra la ejecución en SQLite con estado `started`.
+
+2. **Procesamiento y perfilado** — Pandas detecta el formato del archivo: para JSON comprueba los primeros bytes y aplana estructuras anidadas con `pd.json_normalize`; para CSV prueba combinaciones de codificación y separador sobre los primeros 10 KB. Después analiza las primeras 100 filas y genera un perfil estructural con los nombres de columna, tipos de datos traducidos a XSD y ejemplos representativos.
+
+3. **Recuperación RAG** — El sistema convierte una consulta fija sobre DCAT-AP en un embedding con `nomic-embed-text` (via Ollama en el HOST) y lo compara por similitud de coseno contra los fragmentos de la normativa indexados en Qdrant. Recupera los 5 fragmentos más relevantes, que se inyectan en el prompt como contexto normativo.
+
+4. **Generación y alineación DCAT-AP** — LangChain construye el prompt combinando el contexto normativo del RAG, el perfil del dataset y la muestra de datos. El LLM local (Ollama · Gemma 3 de 1B parámetros, temperatura 0) genera un JSON con título, descripción, palabras clave y tema. El servicio `metadata_service` lo alinea con el esquema DCAT-AP 3.0 produciendo un JSON-LD con `@context`, distribución y variables medidas con sus tipos XSD.
+
+5. **Evaluación y persistencia** — Google Gemini actúa como juez externo y evalúa los metadatos según las 5 dimensiones MQA de data.europa.eu (hasta 405 puntos): Findability, Accessibility, Interoperability, Reusability y Contextuality. Los metadatos se vectorizan e indexan en Qdrant para búsqueda semántica futura. El registro de SQLite se actualiza con estado `completed` y los resultados de la evaluación.
